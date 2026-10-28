@@ -1,0 +1,5 @@
+.DS_Store
+*.log
+tools/*.json
+!tools/schools.py
+!tools/*.py
