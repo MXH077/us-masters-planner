@@ -193,6 +193,35 @@
   .rec-meter{display:flex; align-items:center; gap:9px;}
   .rec-meter .track{flex:1; height:6px; border-radius:3px; background:#EDE8DD; overflow:hidden;}
   .rec-meter .track i{display:block; height:100%; background:var(--tc); border-radius:3px;}
+  .combo-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:18px;
+    padding:12px 16px; background:#F4F8F5; border:1px solid #DCE9E0; border-radius:10px;}
+  .combo-bar .cb-h{font-size:13px; font-weight:600; color:var(--ink);}
+  .combo-bar .cb-note{font-size:11.5px; color:var(--ink3); margin-left:auto;}
+  .combo-out{margin-top:12px; padding:14px 18px; border:1px solid var(--line); border-radius:10px; background:#fff;}
+  .co-head{font-size:13px; margin-bottom:8px;}
+  .co-list{margin:0; padding-left:20px; font-size:12.8px; line-height:2;}
+  .co-tier{display:inline-block; width:34px; font-size:11px; font-weight:600;}
+  .co-name{font-weight:500;}
+  .co-meta{color:var(--ink3); margin-left:10px; font-size:11.5px;}
+  .profile-card{margin-top:20px; border:1px solid var(--line); border-radius:14px; background:#fff; padding:20px 24px;}
+  .pc-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+  .pc-head h3{font-size:16px; margin:0;}
+  .pc-badge{font-size:11px; font-weight:600; padding:3px 9px; border-radius:5px; background:#E8F2EA; color:#2F6B3E;}
+  .pc-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+  .pc-grid span{display:block; font-size:11px; color:var(--ink3); margin-bottom:3px;}
+  .pc-grid b{font-size:14px; font-weight:600;}
+  .pc-grid em{font-style:normal; font-weight:400; color:var(--ink3); font-size:11.5px;}
+  .pc-body{display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:14px;}
+  .pc-h{font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--green);}
+  .pc-h.warn{color:var(--amber);}
+  .pc-col ul{margin:0; padding-left:17px; font-size:12.5px; line-height:1.85; color:var(--ink2);}
+  @media (max-width:760px){ .pc-grid{grid-template-columns:1fr 1fr;} .pc-body{grid-template-columns:1fr;} }
+  .rec .why, .rec .watch{margin-top:10px; padding:9px 11px; border-radius:8px; font-size:12px; line-height:1.7;}
+  .rec .why{background:#F4F8F5; border:1px solid #DCE9E0;}
+  .rec .watch{background:#FCF6EC; border:1px solid #EFE2C9;}
+  .rec .why-h{font-size:11px; font-weight:600; color:var(--ink2); margin-bottom:3px; letter-spacing:.02em;}
+  .rec .why ul, .rec .watch ul{margin:0; padding-left:15px; color:var(--ink2);}
+  .rec .why li, .rec .watch li{margin:1px 0;}
   .rec p.disclaim{margin:-2px 0 0; font-size:10.5px; color:var(--ink3); line-height:1.5;}
   .rec-meter .p{font-family:var(--mono); font-size:11.5px; color:var(--ink2); white-space:nowrap;}
 
@@ -604,7 +633,7 @@
     <section class="panel active" id="panel-match" role="tabpanel">
       <div class="sec-title"><h2>你的背景</h2><span class="hint">改动即时生效，结果自动重排</span></div>
       <p class="sec-sub">没有 GRE 或 TOEFL 就先留空，算法会把它们当作短板计入，并在推荐里标出风险。</p>
-      <p class="prof-sum" id="profSum"></p>
+
 
       <div class="card pf">
         <div class="pf-grid">
@@ -618,6 +647,21 @@
               <option value="shuangfei">双非一本 / 二本</option>
             </select>
             <span class="sub">美国院校不卡 List，但会参考本科学校声誉</span>
+          </div>
+
+          <div class="fld">
+            <label for="fMajor">本科专业</label>
+            <select id="fMajor">
+              <option value="cs" selected>计算机 / 软件工程</option>
+              <option value="ee">电子 / 通信</option>
+              <option value="math">数学 / 统计</option>
+              <option value="physics">物理 / 天文</option>
+              <option value="chembio">化学 / 生物</option>
+              <option value="econ">经济 / 金融</option>
+              <option value="biz">商科 / 管理</option>
+              <option value="other">其他专业</option>
+            </select>
+            <span class="sub">用于生成背景画像，不影响打分</span>
           </div>
 
           <div class="fld">
@@ -767,7 +811,21 @@
         <b style="color:#5C5850">需 CS 本科</b> = 要数据结构、操作系统等核心课。悬停可看依据。
       </p>
 
-      <div id="recResults"></div>
+        <p class="prof-sum" id="profSum"></p>
+      <div id="profileCard"></div>
+      <div class="combo-bar">
+        <span class="cb-h">一键生成最优组合</span>
+        <select id="comboN" class="mini">
+          <option value="6">申请 6 所</option>
+          <option value="8" selected>申请 8 所</option>
+          <option value="10">申请 10 所</option>
+        </select>
+        <button class="btn primary" id="comboGo">生成组合</button>
+        <span class="cb-note">按 2:4:2 分配冲刺/匹配/保底，避开同校重复，优先预算内</span>
+      </div>
+      <div id="comboResult"></div>
+
+    <div id="recResults"></div>
     </section>
 
 
@@ -2399,7 +2457,7 @@
 
   /* ================= 状态 ================= */
   var STORE = "us-ms.v1";
-  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], ins:{}, rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
+  var DEFAULT = {school:"985", fields:["cs"], major:"cs", gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], ins:{}, rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
 
   var state = load();
   function load(){
@@ -2670,6 +2728,39 @@
     safe: {n:"保底", sub:"大概率录取，兜住下限", c:"#0F5F4E", soft:"#E8F0ED"}
   };
 
+
+  /* ================= 推荐理由 / 短板 ================= */
+  var MAJOR_L = {cs:"计算机 / 软件工程", ee:"电子 / 通信", math:"数学 / 统计",
+    physics:"物理 / 天文", chembio:"化学 / 生物", econ:"经济 / 金融",
+    biz:"商科 / 管理", other:"其他专业"};
+
+  function whyReasons(pr, r, P){
+    var out = [];
+    if(pr.conv) out.push("项目明确欢迎非 CS 背景，<b>转码/跨专业</b>申请有制度性支持");
+    if(P.matchN >= 0.7) out.push("你的编程与课程基础（匹配分 <b>" + Math.round(P.matchN*100) + "</b>）能覆盖该项目的主要先修要求");
+    if(P.resN >= 0.5) out.push("有" + (state.paper === "top" || state.paper === "published" ? "<b>发表论文</b>" : "<b>科研/项目经历</b>") + "，在评审里是可写的具体材料");
+    if(pr.phd) out.push("偏研究导向，适合以后读博，你的经历能与导师方向对接");
+    if(pr.int) out.push("有 co-op / 实习学分安排，对<b>留美就业</b>更友好");
+    if(r.over <= 0) out.push("全程约 <b>" + wan(r.totalWan*10000) + " 万</b>，在你的预算内");
+    if(RK(pr) && RK(pr) <= 30) out.push("综排 <b>#" + RK(pr) + "</b>，回国认可度高");
+    if(!out.length) out.push("方向与你的目标一致（" + FIELDS[pr.f].n + "），综排 #" + (RK(pr) || "—"));
+    return out.slice(0, 3);
+  }
+
+  function watchOuts(pr, r, P){
+    var out = [];
+    if(pr.pre === "hard") out.push("明确要求 <b>CS 本科</b>，跨专业需要先补先修课");
+    else if(pr.pre === "soft") out.push("需要补 1–2 门 CS 先修课（数据结构 / 算法）");
+    if(P.toefl && pr.toefl > P.toefl) out.push("语言门槛 <b>" + pr.toefl + "</b>，你当前 " + P.toefl);
+    if(!P.toefl) out.push("未填语言成绩，算法按短板计入");
+    if(pr.gre === "req" && !P.greYes) out.push("该项目<b>强制 GRE</b>，你目前未考");
+    if(r.over > 0) out.push("超出预算约 <b>" + Math.round(r.over) + " 万</b>");
+    if(trustOf(pr) === "est") out.push("学费为<b>推算区间</b>（±" + money(Math.round(pr.tuit*0.1)) + "），需官网核对");
+    if(!progUrl(pr)) out.push("项目页未收录，需自行搜索确认最新要求");
+    if(!out.length) out.push("暂无明显短板，按常规材料准备即可");
+    return out.slice(0, 3);
+  }
+
   function recCard(r, tierKey){
     var pr = r.pr, m = TIER_META[tierKey], P = evalProfile();
     var risk = r.risks.slice();
@@ -2720,6 +2811,10 @@
       '<div class="rec-meter"><div class="track"><i style="width:' + r.pct + '%"></i></div>' +
         '<span class="p">个人匹配度 ' + r.pct + '/100</span></div>' +
       '<p class="disclaim">匹配度反映"你的背景与项目要求的接近程度"，不是录取概率</p>' +
+      '<div class="why"><div class="why-h">为什么推荐</div><ul>' +
+        whyReasons(pr, r, P).map(function(x){ return "<li>" + x + "</li>"; }).join("") + '</ul></div>' +
+      '<div class="watch"><div class="why-h">需要注意</div><ul>' +
+        watchOuts(pr, r, P).map(function(x){ return "<li>" + x + "</li>"; }).join("") + '</ul></div>' +
       '<p class="why">' + esc(whyText(r, evalProfile())) + '</p>' +
       (pr.note ? '<p class="note">' + esc(pr.note) + '</p>' : '') +
       (risk.length ? '<p class="risk">' + esc(risk.join("；")) + '</p>' : '') +
@@ -2738,6 +2833,63 @@
           (schoolUrl(pr.s) ? '<a href="' + schoolUrl(pr.s) + '" target="_blank" rel="noopener">学校官网 ↗</a>' : '') +
         '</div>' +
     '</article>';
+  }
+
+
+  /* ================= 背景画像 ================= */
+  function renderProfileCard(P){
+    var box = document.getElementById("profileCard");
+    if(!box) return;
+    var fields = state.fields.map(function(k){ return FIELDS[k].n; }).join(" / ") || "未选";
+    var gpa100 = Math.round(P.gpa4 / 4 * 100 * 100) / 100;
+
+    var dims = [
+      {k:"GPA", v:P.gpaN}, {k:"科研与项目", v:P.resN}, {k:"专业匹配", v:P.matchN},
+      {k:"语言", v:P.toeflN}, {k:"本科背景", v:P.schoolN}, {k:"GRE", v:P.greN}
+    ].sort(function(a,b){ return b.v - a.v; });
+
+    var strong = [], weak = [];
+    dims.slice(0,2).forEach(function(d){
+      if(d.v < 0.45) return;
+      var txt = {
+        "GPA":"GPA " + P.gpa4.toFixed(2) + " 是硬通货，先别担心它",
+        "科研与项目":"科研/项目经历是你最拿得出手的部分",
+        "专业匹配":"课程与编程基础与目标项目对得上",
+        "语言":"语言成绩达标，不会成为卡点",
+        "本科背景":SCHOOL_LABEL[state.school] + " 的背景在评审里有加分",
+        "GRE":"GRE 量化分数有竞争力"
+      }[d.k];
+      strong.push(txt);
+    });
+    dims.slice(-3).reverse().forEach(function(d){
+      if(d.v >= 0.6) return;
+      var txt = {
+        "GPA":"GPA 偏低，需要用科研或项目补",
+        "科研与项目":"缺少科研/项目经历，这是最容易补也最值钱的一项",
+        "专业匹配":"课程基础与目标项目有差距，建议先补数据结构与算法",
+        "语言":"语言成绩偏低或未考，建议先出分",
+        "本科背景":"本科背景不占优势，靠 GPA 与项目拉开差距",
+        "GRE":"GRE 未考或分数偏低，部分项目要求提交"
+      }[d.k];
+      weak.push(txt);
+    });
+
+    box.innerHTML = '<div class="profile-card">' +
+      '<div class="pc-head"><h3>申请人背景画像</h3><span class="pc-badge">已完成评估</span></div>' +
+      '<div class="pc-grid">' +
+        '<div><span>本科专业</span><b>' + (MAJOR_L[state.major] || "未填") + '</b></div>' +
+        '<div><span>成绩</span><b>' + P.gpa4.toFixed(2) + ' / 4.0 <em>（≈ ' + gpa100.toFixed(1) + ' / 100）</em></b></div>' +
+        '<div><span>目标方向</span><b>' + fields + '</b></div>' +
+        '<div><span>入学时间</span><b>Fall 2027</b></div>' +
+      '</div>' +
+      '<div class="pc-body">' +
+        '<div class="pc-col"><div class="pc-h">申请优势</div><ul>' +
+          (strong.length ? strong : ["暂时没有突出项——先把语言和一门编程课补上"]).map(function(x){ return "<li>" + x + "</li>"; }).join("") +
+        '</ul></div>' +
+        '<div class="pc-col"><div class="pc-h warn">需要补强</div><ul>' +
+          (weak.length ? weak : ["六项都不算弱，重点转为打磨文书与推荐信"]).map(function(x){ return "<li>" + x + "</li>"; }).join("") +
+        '</ul></div>' +
+      '</div></div>';
   }
 
   function renderMatch(){
@@ -2780,6 +2932,10 @@
       cnt.innerHTML = '在项目库 <b>' + PROGRAMS.length + '</b> 个项目中，你的竞争力高于 <b>' + pct + '%</b> 的录取门槛；' +
         '换句话说，约 <b>' + Math.max(0, 100 - pct) + '%</b> 的项目对你来说是冲刺档。';
     }
+
+    renderProfileCard(P);
+    window.__combo = null;
+    renderCombo();
 
     var groups = [
       {key:"reach", rows:R.reach},
@@ -3190,6 +3346,7 @@
     $("#fToefl").value = state.toefl;
     $("#fGre").value = state.gre;
     $("#fGreQ").value = state.greQ;
+    $("#fMajor").value = state.major || "cs";
     $("#fProg").value = state.prog || "mid";
     $("#fDsa").value = String(state.dsa || 0);
     $("#fMl").value = String(state.ml != null ? state.ml : "0");
@@ -3236,6 +3393,14 @@
       clearTimeout(window.__tT);
       window.__tT = setTimeout(renderMatch, 220);
     });
+    var cg = document.getElementById("comboGo");
+    if(cg) cg.addEventListener("click", function(){
+      var n = parseInt(document.getElementById("comboN").value, 10) || 8;
+      window.__combo = buildCombo(n);
+      renderCombo();
+    });
+
+    $("#fMajor").addEventListener("change", function(){ state.major = this.value; save(); renderMatch(); });
     [["fProg","prog"],["fDsa","dsa"],["fMl","ml"],["fPaper","paper"],["fIntern","intern"],["fLor","lor"]]
       .forEach(function(pair){
         var el = document.getElementById(pair[0]);
@@ -3300,6 +3465,7 @@
       state.gpa = DEFAULT.gpa; state.scale = DEFAULT.scale;
       state.toefl = DEFAULT.toefl; state.gre = DEFAULT.gre; state.greQ = DEFAULT.greQ;
       state.budget = DEFAULT.budget; state.regions = [];
+      state.major = DEFAULT.major;
       state.prog = DEFAULT.prog; state.dsa = DEFAULT.dsa; state.math = [];
       state.ml = DEFAULT.ml; state.paper = DEFAULT.paper;
       state.intern = DEFAULT.intern; state.lor = DEFAULT.lor;
@@ -3810,6 +3976,71 @@
     });
   }
 
+
+  /* ================= 最优组合 ================= */
+  function buildCombo(n){
+    var R = recommend(), P = R.P;
+    var q = {reach: Math.max(1, Math.round(n*0.25)), match: Math.max(1, Math.round(n*0.5))};
+    q.safe = Math.max(1, n - q.reach - q.match);
+    while(q.reach + q.match + q.safe > n) q.match--;
+    while(q.reach + q.match + q.safe < n) q.match++;
+
+    var picked = [], usedSchool = {};
+    function take(rows, count){
+      var taken = 0;
+      var sorted = rows.slice().sort(function(a,b){
+        var oa = a.over > 0 ? 1 : 0, ob = b.over > 0 ? 1 : 0;
+        if(oa !== ob) return oa - ob;          // 预算内优先
+        return (b.pct || 0) - (a.pct || 0);    // 匹配度高的优先
+      });
+      for(var i=0;i<sorted.length && taken<count;i++){
+        var r = sorted[i];
+        if(usedSchool[r.pr.s]) continue;
+        usedSchool[r.pr.s] = 1;
+        picked.push(r); taken++;
+      }
+      return taken;
+    }
+    take(R.reach, q.reach);
+    take(R.match, q.match);
+    take(R.safe, q.safe);
+    // 补足
+    var rest = R.reach.concat(R.match, R.safe);
+    for(var i=0;i<rest.length && picked.length<n;i++){
+      var r = rest[i];
+      if(usedSchool[r.pr.s]) continue;
+      if(picked.indexOf(r) > -1) continue;
+      usedSchool[r.pr.s] = 1; picked.push(r);
+    }
+    return picked.slice(0, n);
+  }
+
+  function renderCombo(){
+    var box = document.getElementById("comboResult");
+    if(!box) return;
+    if(!window.__combo) { box.innerHTML = ""; return; }
+    var items = window.__combo;
+    var total = items.reduce(function(s,x){ return s + x.totalWan; }, 0);
+    var h = '<div class="combo-out"><div class="co-head">推荐组合 · <b>' + items.length + '</b> 所 · ' +
+      '8 所合计约 <b>' + Math.round(total) + ' 万</b>（单校平均 ' + Math.round(total/items.length) + ' 万 · 预算 ' + (state.budget || "—") + ' 万/所）'.replace('8 所', items.length + ' 所') +
+      '<button class="btn sm" id="comboSave" style="margin-left:12px">全部加入清单</button></div><ol class="co-list">';
+    items.forEach(function(r){
+      var tier = r.diff >= 0.10 ? "保底" : (r.diff >= -0.02 ? "匹配" : "冲刺");
+      var color = r.diff >= 0.10 ? "var(--green)" : (r.diff >= -0.02 ? "var(--ink2)" : "var(--amber)");
+      h += '<li><span class="co-tier" style="color:' + color + '">' + tier + '</span>' +
+        '<span class="co-name">' + esc(r.pr.s) + ' · ' + esc(r.pr.p) + '</span>' +
+        '<span class="co-meta">' + wan(r.totalWan*10000) + ' 万 · 截止 ' + r.pr.ddl + '</span></li>';
+    });
+    h += '</ol></div>';
+    box.innerHTML = h;
+    var b = document.getElementById("comboSave");
+    if(b) b.addEventListener("click", function(){
+      state.shortlist = items.map(function(r){ return pk(r.pr); });
+      save(); renderMatch(); renderShortlist();
+      b.textContent = "已加入 ✓"; b.disabled = true;
+    });
+  }
+
   /* ================= 对比 ================= */
   function inCmp(p){ return state.compare.indexOf(pk(p)) > -1; }
   function toggleCmp(p){
@@ -3880,6 +4111,22 @@
       var t = d === null ? "滚动" : (d < 0 ? "已过" : "还剩 " + d + " 天");
       return p.ddl + "<br><span style='color:" + (d !== null && d < 30 ? "var(--red)" : "var(--ink3)") + "'>" + t + "</span>";
     });
+    h += cmpRow("全程总费用（含保险）", function(p){
+      var cb = costBreakdown(p);
+      return "<b>" + money(cb.total) + "</b><br><span style='color:var(--ink3);font-size:11px'>≈ " + wan(cb.total*FX) + " 万</span>";
+    });
+    h += cmpRow("STEM 资格", function(p){
+      return STEM.indexOf(p.f) > -1
+        ? "STEM<br><span style='color:var(--ink3);font-size:11px'>可申请 24 个月 OPT 延期<br>需核对 DHS 名单 / CIP</span>"
+        : "非 STEM<br><span style='color:var(--ink3);font-size:11px'>仅 12 个月 OPT</span>";
+    });
+    h += cmpRow("GRE", function(p){
+      return p.gre === "req" ? "Required<br><span style='color:var(--ink3);font-size:11px'>必须提交</span>"
+        : p.gre === "opt" ? "Optional<br><span style='color:var(--ink3);font-size:11px'>可选提交</span>"
+        : "Not Required<br><span style='color:var(--ink3);font-size:11px'>不需要</span>";
+    });
+    h += cmpRow("RA / TA", function(p){ return p.phd ? "有研究资助机会" : "未标注"; });
+    h += cmpRow("就业支持", function(p){ return p.int ? "有 co-op / 实习学分" : "未标注"; });
     h += cmpRow("CS 先修", function(p){ return PRE_LABEL[p.pre] || "—"; });
     h += cmpRow("标签", function(p){
       var t = [];
