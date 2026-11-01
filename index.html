@@ -541,6 +541,11 @@
   .dos-cost td{text-align:right; font-family:var(--mono); padding:6px 0; border-bottom:1px dashed #EEEBE3;}
   .dos-cost td .n{font-family:var(--sans); font-size:10.5px; color:var(--ink3); margin-left:4px;}
   .dos-cost tr.sum th, .dos-cost tr.sum td{border-bottom:none; border-top:1px solid var(--line2); font-weight:600; padding-top:9px;}
+  .ins-check{margin-top:12px; padding:10px 12px; background:#FBF9F4; border:1px solid var(--line);
+    border-radius:8px; font-size:11.5px; color:var(--ink2); line-height:1.9;}
+  .ins-check b{display:block; margin-bottom:4px; font-size:12px; color:var(--ink);}
+  .ins-check span{display:inline-block; margin-right:12px; color:var(--ink3);}
+  .ins-check span::before{content:"· "; color:var(--amber);}
   .dos-src{font-size:11px; color:var(--ink3); margin-top:8px;}
   .dos-src a{color:var(--green);}
   @media (max-width:700px){ .dos-box{width:100%; max-height:92vh;} .dos-row .k{flex:0 0 88px;} }
@@ -794,7 +799,7 @@
           <div class="fld">
             <label>留美倾向</label>
             <div class="chip-row" id="revStay"></div>
-            <span class="sub">勾选后只看 STEM 专业（可享 36 个月 OPT）</span>
+            <span class="sub">只看 STEM 专业。符合条件的 F-1 学生，在满足规定的情况下可申请最长 <b>24 个月</b> STEM OPT 延期，通常与最初 12 个月毕业后 OPT 合计最长 36 个月。是否属于 STEM 以 DHS 的 STEM Designated Degree Program List 与项目 CIP 代码为准，不能仅凭专业名称判断；雇主还需满足 E-Verify 等要求。</span>
           </div>
           <div class="fld span3">
             <label>限定专业</label>
@@ -909,7 +914,7 @@
 
     <section class="panel" id="panel-time" role="tabpanel">
       <div class="sec-title"><h2>倒排时间线</h2><span class="hint">美国是硬截止，没有补交</span></div>
-      <p class="sec-sub">美国硕士的主轮集中在 12 月 1 日到 1 月 15 日，且不接受逾期补材料——推荐信晚一天，整份申请就作废。所以这条线的重点不是"什么时候开始"，而是"什么时候必须全部到齐"。</p>
+      <p class="sec-sub">美国硕士的主轮多集中在 12 月 1 日到 1 月 15 日。推荐信、成绩单、语言成绩等材料应<b>提前</b>准备到位——部分项目在截止后允许一定范围内补交材料，但各校各院系的处理方式并不相同，具体以项目官网规定为准。<br>所以这条线的重点不是"什么时候开始"，而是"什么时候必须基本齐备"。</p>
 
       <div id="tlPersonal"></div>
 
@@ -2394,7 +2399,7 @@
 
   /* ================= 状态 ================= */
   var STORE = "us-ms.v1";
-  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
+  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], ins:{}, rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
 
   var state = load();
   function load(){
@@ -2412,6 +2417,7 @@
     if(!base.tuition) base.tuition = {};
     if(!base.costMode) base.costMode = 'year';
     if(!base.compare) base.compare = [];
+    if(!base.ins) base.ins = {};
     if(!base.rev) base.rev = {regions:[],budget:'100',city:'any',stay:'any',fields:[]};
     if(base.convOnly && !base.only){ base.only = {conv:1,int:0,phd:0}; }
     if(!base.only) base.only = {conv:0,int:0,phd:0,noncs:0};
@@ -3937,6 +3943,13 @@
     return null;
   }
 
+  // 医保：默认仅作占位估算，允许逐校填写实际值
+  function INS(p){
+    var v = state.ins && state.ins[pk(p)];
+    return (isFinite(v) && v > 0) ? v : 3800;
+  }
+  function insKnown(p){ return !!(state.ins && isFinite(state.ins[pk(p)]) && state.ins[pk(p)] > 0); }
+
   // 学费 / 必缴费用 / 医保 / 住宿 / 餐饮 / 交通 / 其他
   function costBreakdown(p){
     var lw = lwFor(p.city), parts = (lw && lw.parts) || null;
@@ -3947,7 +3960,7 @@
     var internet= parts ? (parts.internet || 1500) : 1500;
     var civic   = parts ? parts.civic : Math.round(p.liv * 0.12);
     var fees    = p.priv === false ? 1800 : 2200;
-    var ins     = 3800;
+    var ins     = INS(p);
     var tuit    = TUIT(p);
     var other   = internet + civic;
     var total   = tuit + fees + ins + housing + food + trans + other;
@@ -4010,7 +4023,8 @@
         '<tr><th>Tuition 学费</th><td>' + money2(perYear(cb.tuit)) +
           (p.est ? '<span class="n"> 区间 ' + money2(Math.round(perYear(cb.tuit*0.9))) + '–' + money2(Math.round(perYear(cb.tuit*1.1))) + '</span>' : '') + '</td></tr>' +
         '<tr><th>Mandatory Fees 必缴费用</th><td>' + money2(cb.fees) + '<span class="n"> 估算</span></td></tr>' +
-        '<tr><th>Health Insurance 医保</th><td>' + money2(cb.ins) + '<span class="n"> 估算，可用学校保险替换</span></td></tr>' +
+        '<tr><th>Health Insurance 医保</th><td><span data-ins="' + esc(pk(p)) + '" style="cursor:pointer; border-bottom:1px dashed var(--line2)">' + money2(cb.ins) + '</span>' +
+          '<span class="n"> ' + (insKnown(p) ? "已填写" : "占位估算 · 点击填官网实际值") + '</span></td></tr>' +
         '<tr><th>Housing 住宿</th><td>' + money2(cb.housing) + '<span class="n"> ' + (cb.real ? "合租口径 · " + esc(cb.county) : "城市均值") + '</span></td></tr>' +
         '<tr><th>Food 餐饮</th><td>' + money2(cb.food) + '</td></tr>' +
         '<tr><th>Transportation 交通</th><td>' + money2(cb.trans) + '</td></tr>' +
@@ -4018,6 +4032,9 @@
         '<tr class="sum"><th>合计 / 年</th><td>' + money2(perYear(cb.total)) + '</td></tr>' +
         '<tr class="sum"><th>合计 / 全程（' + p.dur + ' 年）</th><td>' + money2(cb.total) + ' ≈ ' + wan(cb.total * FX) + ' 万</td></tr>' +
         '</tbody></table>' +
+        '<div class="ins-check"><b>医保要核对的 6 件事</b>（各校差异很大，不要用一个区间套所有学校）：' +
+          '<span>学校强制保费金额</span><span>是否允许 Waive</span><span>免赔额 Deductible</span>' +
+          '<span>Out-of-pocket Maximum</span><span>校外保险是否被接受</span><span>覆盖期限（12 个月 / 学年）</span></div>' +
         (cb.lwUrl ? '<div class="dos-src">生活分项来源：<a href="' + cb.lwUrl + '" target="_blank" rel="noopener">MIT Living Wage · ' + esc(cb.county) + ' ↗</a></div>' : '') +
 
         '<div class="dos-sec">数据状态</div>' +
@@ -4034,6 +4051,21 @@
     wrap.addEventListener("click", function(e){ if(e.target === wrap) closeDossier(); });
   }
   function bindDossier(){
+    document.addEventListener("click", function(e){
+      var t = e.target.closest("[data-ins]");
+      if(!t) return;
+      var k2 = t.dataset.ins;
+      var p2 = PROGRAMS.filter(function(x){ return pk(x) === k2; })[0];
+      if(!p2) return;
+      var v = window.prompt("填写「" + p2.s + "」官网公布的年度医保费用（美元）。留空恢复占位估算 $3,800", insKnown(p2) ? state.ins[k2] : "");
+      if(v === null) return;
+      v = v.replace(/[^0-9.]/g, "");
+      if(!state.ins) state.ins = {};
+      if(v === "") delete state.ins[k2];
+      else if(isFinite(parseFloat(v)) && parseFloat(v) > 0) state.ins[k2] = Math.round(parseFloat(v));
+      else return;
+      save(); openDossier(p2);
+    });
     document.addEventListener("click", function(e){
       var b = e.target.closest("[data-dos]");
       if(!b) return;
