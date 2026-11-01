@@ -193,6 +193,41 @@
   .rec-meter{display:flex; align-items:center; gap:9px;}
   .rec-meter .track{flex:1; height:6px; border-radius:3px; background:#EDE8DD; overflow:hidden;}
   .rec-meter .track i{display:block; height:100%; background:var(--tc); border-radius:3px;}
+  .store-note{font-size:12px; color:var(--ink2); background:#FBF7EE; border:1px solid #EBD9BC;
+    border-radius:8px; padding:10px 14px; margin-bottom:20px; line-height:1.7;}
+  .store-note b{color:var(--ink);}
+  #board{margin-bottom:26px;}
+  .board-empty{padding:16px 20px; border:1px dashed var(--line2); border-radius:12px; font-size:13px; color:var(--ink3);}
+  .board-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px;}
+  .board-head h3{font-size:16px; margin:0;}
+  .board-pct{font-size:22px; font-weight:600; font-family:var(--mono); color:var(--green);}
+  .board-bar{height:9px; border-radius:5px; background:#EFEDE6; overflow:hidden;}
+  .board-bar i{display:block; height:100%; background:linear-gradient(90deg,#2E6B4F,#4E9370);}
+  .board-sub{font-size:11.5px; color:var(--ink3); margin:6px 0 12px;}
+  .board-t{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .board-t th{font-weight:500; color:var(--ink3); font-size:11px; padding:7px 6px; border-bottom:1px solid var(--line); text-align:center;}
+  .board-t th:first-child{text-align:left;}
+  .board-t td{padding:8px 6px; border-bottom:1px dashed #EEEBE3; text-align:center;}
+  .board-t td.bt-name{text-align:left; font-weight:500;}
+  .board-t td.bt-name small{display:block; font-weight:400; color:var(--ink3); font-size:11px;}
+  .bt-pct{font-family:var(--mono); color:var(--ink3); font-size:11.5px;}
+  .bstage{width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line2); background:#fff;
+    color:#fff; font-size:12px; cursor:pointer; line-height:1; padding:0;}
+  .bstage.on{background:var(--green); border-color:var(--green);}
+  .gap-card{margin-top:16px; border:1px solid var(--line); border-radius:14px; background:#fff; padding:18px 22px;}
+  .gap-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;}
+  .gap-head h3{font-size:15px; margin:0;}
+  .gap-rate{font-size:12.5px; color:var(--ink3); font-variant-numeric:tabular-nums;}
+  .gap-bar{height:7px; border-radius:4px; background:#EFEDE6; overflow:hidden; margin-bottom:14px;}
+  .gap-bar i{display:block; height:100%; background:linear-gradient(90deg,#2E6B4F,#4E9370); border-radius:4px;}
+  .gap-sec{font-size:12px; font-weight:600; color:var(--amber); margin-bottom:6px;}
+  .gap-list{margin:0 0 10px; padding:0; list-style:none;}
+  .gap-list li{display:flex; gap:10px; align-items:baseline; padding:5px 0; border-bottom:1px dashed #EEEBE3; font-size:12.8px;}
+  .gap-tag{flex:0 0 auto; font-size:10px; padding:1px 7px; border-radius:4px; background:#F9EFDF; color:#A9661A;}
+  .gap-why{color:var(--ink3); font-size:11.5px; margin-left:auto; text-align:right;}
+  .gap-ok{font-size:13px; color:var(--green); padding:8px 0;}
+  .gap-have{font-size:12px; color:var(--ink3); padding-top:6px; border-top:1px solid var(--line);}
+  .gap-note{font-size:11px; color:var(--ink3); margin-top:8px;}
   .combo-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:18px;
     padding:12px 16px; background:#F4F8F5; border:1px solid #DCE9E0; border-radius:10px;}
   .combo-bar .cb-h{font-size:13px; font-weight:600; color:var(--ink);}
@@ -609,7 +644,7 @@
     <h1>美国硕士 <em>选校推荐</em></h1>
     <p class="lede">填几项背景，得到一份带学费、生活费、城市地区信息的院校清单，并按冲刺 / 匹配 / 保底分档。数字用于横向比较，最终以项目官网为准。</p>
     <div class="hero-meta">
-      <span>项目库 <b id="mCount">—</b> 个</span>
+      <span>项目库 <b id="mCount">1117</b> 个</span>
       <span>覆盖 <b>35</b> 个方向</span>
       <span>地区 <b>4</b> 大区</span>
       <span>生活费 <b>39</b> 县实测</span>
@@ -747,7 +782,9 @@
               </div>
             </div>
             <div class="chip-row" id="fMath" style="margin-top:10px"></div>
-            <span class="sub">数学课程（多选）：线性代数 / 概率统计 / 微积分 / 离散数学</span>
+            <span class="sub">数学课程（多选）</span>
+            <div class="chip-row" id="fCs" style="margin-top:8px"></div>
+            <span class="sub">CS 系统课（多选）：操作系统 / 计算机网络 / 数据库</span>
           </div>
 
           <div class="fld">
@@ -813,6 +850,7 @@
 
         <p class="prof-sum" id="profSum"></p>
       <div id="profileCard"></div>
+      <div id="gapReport"></div>
       <div class="combo-bar">
         <span class="cb-h">一键生成最优组合</span>
         <select id="comboN" class="mini">
@@ -871,6 +909,11 @@
     </section>
 
     <section class="panel" id="panel-shortlist" role="tabpanel">
+      <div class="store-note">
+        <b>数据只存在这台设备的浏览器里</b>（localStorage）。换浏览器、清缓存、换设备都会丢，
+        建议定期点「导出备份」存一份 JSON；换设备后「导入备份」即可恢复。
+      </div>
+      <div id="board"></div>
       <div class="sec-title"><h2>我的清单</h2><span class="hint">收藏的项目汇总到这里</span></div>
       <p class="sec-sub">在推荐卡片或项目库点 ☆ 收藏。清单只存在本机，可以打印、导出 CSV，或复制成表格发给家人、中介对照。</p>
 
@@ -2457,7 +2500,7 @@
 
   /* ================= 状态 ================= */
   var STORE = "us-ms.v1";
-  var DEFAULT = {school:"985", fields:["cs"], major:"cs", gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], ins:{}, rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
+  var DEFAULT = {school:"985", fields:["cs"], major:"cs", gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], cs:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], ins:{}, progress:{}, rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
 
   var state = load();
   function load(){
@@ -2476,6 +2519,7 @@
     if(!base.costMode) base.costMode = 'year';
     if(!base.compare) base.compare = [];
     if(!base.ins) base.ins = {};
+    if(!base.progress) base.progress = {};
     if(!base.rev) base.rev = {regions:[],budget:'100',city:'any',stay:'any',fields:[]};
     if(base.convOnly && !base.only){ base.only = {conv:1,int:0,phd:0}; }
     if(!base.only) base.only = {conv:0,int:0,phd:0,noncs:0};
@@ -2934,6 +2978,7 @@
     }
 
     renderProfileCard(P);
+    renderGapReport();
     window.__combo = null;
     renderCombo();
 
@@ -3353,6 +3398,11 @@
     $("#fPaper").value = state.paper || "none";
     $("#fIntern").value = String(state.intern != null ? state.intern : "0");
     $("#fLor").value = state.lor || "weak";
+    $("#fCs").innerHTML = [["os","操作系统"],["net","计算机网络"],["db","数据库"]]
+      .map(function(x){
+        return '<button class="chip sm" data-cs="' + x[0] + '" aria-pressed="' +
+          ((state.cs||[]).indexOf(x[0]) > -1) + '">' + x[1] + '</button>';
+      }).join("");
     $("#fMath").innerHTML = [["la","线性代数"],["prob","概率统计"],["calc","微积分"],["disc","离散数学"]]
       .map(function(x){
         return '<button class="chip sm" data-math="' + x[0] + '" aria-pressed="' +
@@ -3407,6 +3457,14 @@
         if(!el) return;
         el.addEventListener("change", function(){ state[pair[1]] = this.value; save(); renderMatch(); });
       });
+    document.getElementById("fCs").addEventListener("click", function(e){
+      var b = e.target.closest("[data-cs]"); if(!b) return;
+      var v = b.dataset.cs;
+      if(!state.cs) state.cs = [];
+      var i = state.cs.indexOf(v);
+      if(i > -1) state.cs.splice(i,1); else state.cs.push(v);
+      save(); syncForm(); renderMatch();
+    });
     document.getElementById("fMath").addEventListener("click", function(e){
       var b = e.target.closest("[data-math]"); if(!b) return;
       var v = b.dataset.math;
@@ -3466,7 +3524,7 @@
       state.toefl = DEFAULT.toefl; state.gre = DEFAULT.gre; state.greQ = DEFAULT.greQ;
       state.budget = DEFAULT.budget; state.regions = [];
       state.major = DEFAULT.major;
-      state.prog = DEFAULT.prog; state.dsa = DEFAULT.dsa; state.math = [];
+      state.prog = DEFAULT.prog; state.dsa = DEFAULT.dsa; state.math = []; state.cs = [];
       state.ml = DEFAULT.ml; state.paper = DEFAULT.paper;
       state.intern = DEFAULT.intern; state.lor = DEFAULT.lor;
       save(); syncForm(); renderMatch();
@@ -3786,6 +3844,7 @@
   function totalWan(p){ return (TUIT(p) + p.liv) * p.dur * FX / 10000; }
 
   function renderShortlist(){
+    if(typeof renderBoard === 'function') renderBoard();
     var items = slItems();
     document.getElementById("slCount").textContent = items.length;
 
@@ -3976,6 +4035,109 @@
     });
   }
 
+
+
+
+  /* ================= 申请进度看板 ================= */
+  var APP_STAGES = [
+    {k:"sop",   n:"个人陈述"},
+    {k:"lor",   n:"推荐信"},
+    {k:"score", n:"语言送分"},
+    {k:"submit",n:"正式提交"}
+  ];
+
+  function progOf(k2){
+    if(!state.progress) state.progress = {};
+    if(!state.progress[k2]) state.progress[k2] = {};
+    return state.progress[k2];
+  }
+
+  function renderBoard(){
+    var box = document.getElementById("board");
+    if(!box) return;
+    var items = (state.shortlist || []).map(function(k){
+      return PROGRAMS.filter(function(p){ return pk(p) === k; })[0];
+    }).filter(Boolean);
+
+    if(!items.length){
+      box.innerHTML = '<div class="board-empty">清单还是空的。先去「选校推荐」收藏几所，这里会显示进度。</div>';
+      return;
+    }
+
+    var done = 0, total = items.length * APP_STAGES.length;
+    items.forEach(function(p){
+      var st = progOf(pk(p));
+      APP_STAGES.forEach(function(s){ if(st[s.k]) done++; });
+    });
+    var pctNum = Math.round(done / total * 100);
+
+    var h = '<div class="board-head"><h3>2027 Fall 申请进度</h3>' +
+      '<span class="board-pct">' + pctNum + '%</span></div>' +
+      '<div class="board-bar"><i style="width:' + pctNum + '%"></i></div>' +
+      '<div class="board-sub">已完成 ' + done + ' / ' + total + ' 项</div>' +
+      '<table class="board-t"><thead><tr><th style="text-align:left">学校 / 项目</th>' +
+        APP_STAGES.map(function(s){ return '<th>' + s.n + '</th>'; }).join("") +
+        '<th>进度</th></tr></thead><tbody>';
+
+    items.forEach(function(p){
+      var k2 = pk(p), st = progOf(k2);
+      var n = APP_STAGES.filter(function(s){ return st[s.k]; }).length;
+      h += '<tr><td class="bt-name">' + esc(p.s) + '<small>' + esc(p.p) + '</small></td>' +
+        APP_STAGES.map(function(s){
+          return '<td><button class="bstage' + (st[s.k] ? " on" : "") + '" data-bstage="' + k2 + '|' + s.k + '" aria-pressed="' + !!st[s.k] + '">' +
+            (st[s.k] ? "✓" : "") + '</button></td>';
+        }).join("") +
+        '<td class="bt-pct">' + n + '/' + APP_STAGES.length + '</td></tr>';
+    });
+    h += '</tbody></table>';
+    box.innerHTML = h;
+  }
+
+  /* ================= 课程缺口报告 ================= */
+  function courseGap(){
+    var m = state.math || [], cs = state.cs || [];
+    var items = [
+      {k:"线性代数", ok:m.indexOf("la")>-1, tier:"数学基础", why:"几乎所有 CS/AI 项目都要求"},
+      {k:"概率论与统计", ok:m.indexOf("prob")>-1, tier:"数学基础", why:"机器学习方向必需"},
+      {k:"微积分", ok:m.indexOf("calc")>-1, tier:"数学基础", why:"高数/优化课的前置"},
+      {k:"离散数学", ok:m.indexOf("disc")>-1, tier:"数学基础", why:"算法与理论课的基础"},
+      {k:"数据结构与算法", ok:String(state.dsa)==="1", tier:"CS 核心", why:"绝大多数项目写明的先修"},
+      {k:"编程能力（Python/C++/Java）", ok:state.prog !== "weak", tier:"CS 核心", why:"课程作业与项目的基本功"},
+      {k:"操作系统", ok:cs.indexOf("os")>-1, tier:"CS 系统课", why:"部分项目要求，偏系统方向必备"},
+      {k:"计算机网络", ok:cs.indexOf("net")>-1, tier:"CS 系统课", why:"部分项目要求"},
+      {k:"数据库", ok:cs.indexOf("db")>-1, tier:"CS 系统课", why:"数据方向加分"}
+    ];
+    return items;
+  }
+
+  function renderGapReport(){
+    var box = document.getElementById("gapReport");
+    if(!box) return;
+    var items = courseGap();
+    var miss = items.filter(function(x){ return !x.ok; });
+    var have = items.filter(function(x){ return x.ok; });
+    var rate = Math.round(have.length / items.length * 100);
+
+    var h = '<div class="gap-card">' +
+      '<div class="gap-head"><h3>课程缺口报告</h3>' +
+      '<span class="gap-rate">已具备 ' + have.length + ' / ' + items.length + '（' + rate + '%）</span></div>' +
+      '<div class="gap-bar"><i style="width:' + rate + '%"></i></div>';
+
+    if(miss.length){
+      h += '<div class="gap-sec">建议补强（按优先级）</div><ul class="gap-list">';
+      miss.forEach(function(x){
+        h += '<li><span class="gap-tag">' + x.tier + '</span><b>' + x.k + '</b><span class="gap-why">' + x.why + '</span></li>';
+      });
+      h += '</ul>';
+    }else{
+      h += '<div class="gap-ok">九项先修全部具备，可以直接冲 CS/AI 项目。</div>';
+    }
+    if(have.length){
+      h += '<div class="gap-have">已具备：' + have.map(function(x){ return x.k; }).join(" · ") + '</div>';
+    }
+    h += '<div class="gap-note">这是对照"常见 CS 硕士先修要求"的自查，不同项目要求不同，最终以各项目官网为准。</div></div>';
+    box.innerHTML = h;
+  }
 
   /* ================= 最优组合 ================= */
   function buildCombo(n){
@@ -4297,6 +4459,18 @@
     document.getElementById("dosClose").addEventListener("click", closeDossier);
     wrap.addEventListener("click", function(e){ if(e.target === wrap) closeDossier(); });
   }
+  function bindBoard(){
+    document.addEventListener("click", function(e){
+      var b = e.target.closest("[data-bstage]");
+      if(!b) return;
+      var raw = b.dataset.bstage, cut = raw.lastIndexOf("|");
+      var st = progOf(raw.slice(0, cut));
+      var stg = raw.slice(cut + 1);
+      st[stg] = !st[stg];
+      save(); renderBoard();
+    });
+  }
+
   function bindDossier(){
     document.addEventListener("click", function(e){
       var t = e.target.closest("[data-ins]");
@@ -4353,11 +4527,13 @@
     if(_sp) _sp.textContent = PROGRAMS.length;
     if(_se) _se.textContent = PROGRAMS.filter(function(p){ return p.est; }).length;
     renderShortlist();
+    renderBoard();
     renderReverse();
     bindReverse();
     renderCmpBar();
     bindShortlist();
     bindDossier();
+    bindBoard();
     bindCompare();
     bindBackup();
 
