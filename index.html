@@ -151,6 +151,7 @@
   .cbar .track i.warn{background:var(--amber);}
   .cbar .n{font-family:var(--mono); font-size:12px; color:var(--ink2); white-space:nowrap;
            display:flex; flex-direction:column; align-items:flex-end; line-height:1.35;}
+  .cbar.skip{opacity:.55;}
   .cbar .n i{font-style:normal; font-size:10px; color:var(--ink3);}
 
 
@@ -628,6 +629,8 @@
   .dos-cost th{text-align:left; font-weight:500; color:var(--ink2); padding:6px 0; border-bottom:1px dashed #EEEBE3;}
   .dos-cost td{text-align:right; font-family:var(--mono); padding:6px 0; border-bottom:1px dashed #EEEBE3;}
   .dos-cost td .n{font-family:var(--sans); font-size:10.5px; color:var(--ink3); margin-left:4px;}
+  .dos-cost tr.bud th, .dos-cost tr.bud td{border-bottom:none; padding:10px 0 4px; text-align:left;}
+  .dos-cost tr.bud td{text-align:right;}
   .dos-cost tr.sum th, .dos-cost tr.sum td{border-bottom:none; border-top:1px solid var(--line2); font-weight:600; padding-top:9px;}
   .ins-check{margin-top:12px; padding:10px 12px; background:#FBF9F4; border:1px solid var(--line);
     border-radius:8px; font-size:11.5px; color:var(--ink2); line-height:1.9;}
@@ -971,7 +974,7 @@
     <section class="panel" id="panel-db" role="tabpanel">
       <div class="sec-title"><h2>项目库</h2><span class="hint">点击表头可排序</span></div>
       <div class="trust-bar" id="trustBar"></div>
-      <p class="sec-sub">共 <b id="dbCount">0</b> 个项目，覆盖 100 余所院校、35 个专业方向。生活费为该校所在城市 MIT Living Wage 实测值（学生口径，见「数据来源」页）；学费为区间参考，带 <span class="est">估算</span> 徽标的是按学校档位批量推算的条目。综排为 <b>US News 2026 版</b>，点击名次可改。</p>
+      <p class="sec-sub"><b id="dbCount">0</b> 条筛选结果 · 全库 <b id="dbTotal">1117</b> 条记录，其中 <b id="dbDetail">67</b> 条有详细资料、<b id="dbVfy">3</b> 条经官网核实。覆盖 100 余所院校、35 个专业方向。生活费为该校所在城市 MIT Living Wage 实测值（学生口径，见「数据来源」页）；学费为区间参考，带 <span class="est">估算</span> 徽标的是按学校档位批量推算的条目。综排为 <b>US News 2026 版</b>，点击名次可改。</p>
 
       <div class="db-filters">
         <span class="lbl">方向</span>
@@ -2673,7 +2676,19 @@
              + 0.20*(LOR_N[state.lor] != null ? LOR_N[state.lor] : 0.35);
 
     // 六维：GPA 25% / 科研项目 25% / 专业匹配 20% / 语言 10% / 本科 10% / GRE 10%
-    var score = 0.25*gpaN + 0.25*resN + 0.20*matchN + 0.10*toeflN + 0.10*schoolN + 0.10*greN;
+    // 缺失值不按 0 计，而是从分母里剔除后按比例重归一化：
+    // 没考 GRE / 没填语言，不该被当成"考砸了"，但也不能白拿分。
+    var dims = [
+      {k:"GPA", v:gpaN, w:0.25, has:true},
+      {k:"科研", v:resN, w:0.25, has:true},
+      {k:"匹配", v:matchN, w:0.20, has:true},
+      {k:"语言", v:toeflN, w:0.10, has:!!toefl},
+      {k:"院校", v:schoolN, w:0.10, has:true},
+      {k:"GRE", v:greN, w:0.10, has:!!greYes}
+    ];
+    var wSum = dims.filter(function(d){ return d.has; }).reduce(function(a,d){ return a + d.w; }, 0);
+    var score = dims.filter(function(d){ return d.has; })
+      .reduce(function(a,d){ return a + d.v * d.w; }, 0) / wSum;
 
     var label = score >= 0.78 ? "强（前 10%）"
               : score >= 0.66 ? "中上（前 25%）"
@@ -2682,7 +2697,7 @@
               : "偏弱，需补短板";
 
     return {gpa4:gpa4, toefl:toefl, greYes:greYes, greQ:greQ, schoolN:schoolN, greN:greN,
-            gpaN:gpaN, toeflN:toeflN, resN:resN, matchN:matchN, score:score, label:label};
+            gpaN:gpaN, toeflN:toeflN, resN:resN, matchN:matchN, wSum:wSum, score:score, label:label};
   }
 
   /* ================= 推荐引擎 ================= */
@@ -2990,15 +3005,16 @@
       {t:"GPA", v:P.gpaN, n:P.gpa4.toFixed(2), w:0.25, warn:P.gpaN < 0.5},
       {t:"科研", v:P.resN, n:Math.round(P.resN*100) + "", w:0.25, warn:P.resN < 0.4},
       {t:"匹配", v:P.matchN, n:Math.round(P.matchN*100) + "", w:0.20, warn:P.matchN < 0.6},
-      {t:"语言", v:P.toeflN, n:P.toefl ? "T" + P.toefl : "未填", w:0.10, warn:P.toeflN < 0.45},
+      {t:"语言", v:P.toeflN, n:P.toefl ? "T" + P.toefl : "未填 · 不计入", w:0.10, warn:P.toefl && P.toeflN < 0.45, skip:!P.toefl},
       {t:"院校", v:P.schoolN, n:SCHOOL_LABEL[state.school], w:0.10, warn:P.schoolN < 0.7},
-      {t:"GRE", v:P.greN, n:P.greYes ? "Q" + P.greQ : "未考", w:0.10, warn:false}
+      {t:"GRE", v:P.greN, n:P.greYes ? "Q" + P.greQ : "未考 · 不计入", w:0.10, warn:false, skip:!P.greYes}
     ];
     $("#compBars").innerHTML = bars.map(function(b){
-      var contrib = (b.v * b.w);
-      return '<div class="cbar"><span class="t">' + b.t + '</span>' +
-        '<span class="track"><i class="' + (b.warn ? "warn" : "") + '" style="width:' + Math.round(b.v*100) + '%"></i></span>' +
-        '<span class="n"><span>' + b.n + '</span><i>×' + b.w.toFixed(2) + ' = ' + contrib.toFixed(2) + '</i></span></div>';
+      var effW = b.skip ? 0 : b.w / (P.wSum || 1);
+      var contrib = b.skip ? 0 : b.v * effW;
+      return '<div class="cbar' + (b.skip ? " skip" : "") + '"><span class="t">' + b.t + '</span>' +
+        '<span class="track"><i class="' + (b.warn ? "warn" : "") + '" style="width:' + Math.round((b.skip ? 0 : b.v)*100) + '%"></i></span>' +
+        '<span class="n"><span>' + b.n + '</span><i>' + (b.skip ? "不计入" : "×" + effW.toFixed(2) + " = " + contrib.toFixed(2)) + '</i></span></div>';
     }).join("");
 
     var below = PROGRAMS.filter(function(p){ return p.d < P.score; }).length;
@@ -3161,7 +3177,7 @@
       var c = {verified:0, third:0, est:0, stale:0};
       PROGRAMS.forEach(function(p){ c[trustOf(p)]++; });
       tb.innerHTML =
-        '<span>全库 <b>' + PROGRAMS.length + '</b> 条</span>' +
+        '<span>全库 <b>' + PROGRAMS.length + '</b> 条 = 详细 <b>' + PROGRAMS.filter(function(p){ return !p.est; }).length + '</b> + 生成 <b>' + PROGRAMS.filter(function(p){ return p.est; }).length + '</b></span>' +
         '<span><span class="ttag t-verified">官方已核实</span> <b>' + c.verified + '</b></span>' +
         '<span><span class="ttag t-third">第三方数据</span> <b>' + c.third + '</b></span>' +
         '<span><span class="ttag t-est">估算数据</span> <b>' + c.est + '</b></span>' +
@@ -4565,6 +4581,29 @@
     return {t:"需要更新（" + days + " 天前）", cls:"t-stale"};
   }
 
+  // 三档：节俭（合租+自炊）/ 标准 / 宽裕（单人公寓+外食）
+  function costTiers(p){
+    var cb = costBreakdown(p);
+    var thrifty = {
+      housing: Math.round(cb.housing*0.72), food: Math.round(cb.food*0.78),
+      trans: Math.round(cb.trans*0.85), other: Math.round(cb.other*0.75)
+    };
+    var generous = {
+      housing: Math.round(cb.housing*1.55), food: Math.round(cb.food*1.35),
+      trans: Math.round(cb.trans*1.15), other: Math.round(cb.other*1.3)
+    };
+    var fixed = cb.tuit + cb.fees + cb.ins;
+    var sum = function(o){ return fixed + o.housing + o.food + o.trans + o.other; };
+    var base = {housing:cb.housing, food:cb.food, trans:cb.trans, other:cb.other};
+    return {thrifty: sum(thrifty), standard: sum(base), generous: sum(generous)};
+  }
+  function tierLine(cb, p){
+    var t = costTiers(p);
+    var w = function(x){ return wan(x*FX); };
+    return '<span style="font-size:12px">节俭 <b>' + w(t.thrifty) + ' 万</b> · 标准 <b>' + w(t.standard) +
+      ' 万</b> · 宽裕 <b>' + w(t.generous) + ' 万</b><span class="n">全程 ' + p.dur + ' 年 · 固定项（学费+费用+保险）不变</span></span>';
+  }
+
   function openDossier(p){
     var cb = costBreakdown(p), fr = freshness(p), tr = TRUST[trustOf(p)];
     var ven = p.vsrc ? "已确认" : "未确认";
@@ -4612,7 +4651,8 @@
         '<tr><th>Food 餐饮</th><td>' + money2(cb.food) + '</td></tr>' +
         '<tr><th>Transportation 交通</th><td>' + money2(cb.trans) + '</td></tr>' +
         '<tr><th>Other 其他开销</th><td>' + money2(cb.other) + '<span class="n"> 网络 + 个人</span></td></tr>' +
-        '<tr class="sum"><th>合计 / 年</th><td>' + money2(perYear(cb.total)) + '</td></tr>' +
+        '<tr class="sum"><th>合计 / 年（标准）</th><td>' + money2(perYear(cb.total)) + '</td></tr>' +
+        '<tr class="bud"><th>三档生活方式</th><td>' + tierLine(cb, p) + '</td></tr>' +
         '<tr class="sum"><th>合计 / 全程（' + p.dur + ' 年）</th><td>' + money2(cb.total) + ' ≈ ' + wan(cb.total * FX) + ' 万</td></tr>' +
         '</tbody></table>' +
         '<div class="ins-check"><b>医保要核对的 6 件事</b>（各校差异很大，不要用一个区间套所有学校）：' +
@@ -4697,6 +4737,9 @@
     renderChecklist();
     renderPolicy();
     renderSources();
+    ["dbTotal"].forEach(function(id){ var e = document.getElementById(id); if(e) e.textContent = PROGRAMS.length; });
+    var _dv = document.getElementById("dbVfy"); if(_dv) _dv.textContent = PROGRAMS.filter(function(x){ return x.vfy; }).length;
+    var _dd = document.getElementById("dbDetail"); if(_dd) _dd.textContent = PROGRAMS.filter(function(x){ return !x.est; }).length;
     var _sp = document.getElementById("srcProgCount"), _se = document.getElementById("srcEstCount");
     if(_sp) _sp.textContent = PROGRAMS.length;
     if(_se) _se.textContent = PROGRAMS.filter(function(p){ return p.est; }).length;
