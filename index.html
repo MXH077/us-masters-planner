@@ -193,6 +193,7 @@
   .rec-meter{display:flex; align-items:center; gap:9px;}
   .rec-meter .track{flex:1; height:6px; border-radius:3px; background:#EDE8DD; overflow:hidden;}
   .rec-meter .track i{display:block; height:100%; background:var(--tc); border-radius:3px;}
+  .rec p.disclaim{margin:-2px 0 0; font-size:10.5px; color:var(--ink3); line-height:1.5;}
   .rec-meter .p{font-family:var(--mono); font-size:11.5px; color:var(--ink2); white-space:nowrap;}
 
   .rec p.why{margin:0; font-size:12.4px; line-height:1.65; color:var(--ink2);}
@@ -210,6 +211,12 @@
 
   .sch-link{color:inherit; text-decoration:none; border-bottom:1px solid transparent;}
   .sch-link:hover{color:var(--green); border-bottom-color:#BBD3CB;}
+  .lvtag{display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:4px; letter-spacing:.02em;}
+  .lvtag.lv5{background:#F9E9E7; color:#9B3A32;}
+  .lvtag.lv4{background:#F9EFDF; color:#A9661A;}
+  .lvtag.lv3{background:#F1EDE4; color:#6B6558;}
+  .lvtag.lv2{background:#EAF0F8; color:#2F4B7C;}
+  .lvtag.lv1{background:#E8F2EA; color:#2F6B3E;}
   .rk{display:inline-block; margin-left:8px; font-family:var(--mono); font-size:11px; font-weight:600;
       color:var(--ink2); background:#F1EDE4; border-radius:5px; padding:1px 6px; vertical-align:2px;
       cursor:pointer; border:1px dashed var(--line2);}
@@ -706,7 +713,7 @@
               · 语言分 = (TOEFL − 79) / 41，截断在 0–1；未填按 0.22<br>
               · 院校分：海本 0.95 / 985 1.00 / 中外合办 0.85 / 211 0.72 / 双非 0.42<br>
               · GRE分 = (Q − 155) / 15，截断在 0–1；未考按 0.50<br>
-              <span style="color:var(--ink3)">难度分 → 参考录取率：≥0.88 &lt;10% · ≥0.80 10–20% · ≥0.70 20–35% · ≥0.60 35–50% · ≥0.50 50–65% · 其余 65%+（换算，非官方数据）</span><br>
+              <span style="color:var(--ink3)">难度分 → 等级：≥0.88 极高 · ≥0.78 高 · ≥0.66 中高 · ≥0.52 中等 · 其余较低。<b>这是项目门槛，不是你的录取概率。</b></span><br>
               分段：<b>≥0.78</b> 强 · <b>≥0.66</b> 中上 · <b>≥0.55</b> 中等 · <b>≥0.45</b> 中下 · 更低为偏弱
             </div>
           </details>
@@ -2618,7 +2625,8 @@
     var dom = SCHOOL_DOM[pr.s] || "";
     var q = encodeURIComponent(dom ? ('site:' + dom + ' "' + pr.p + '" tuition 2027') : (pr.s + " " + pr.p + " tuition 2027"));
     return '<article class="card rec" style="--tc:' + m.c + ';--tc-soft:' + m.soft + '">' +
-      '<div class="rec-top"><span class="tier">' + m.n + '</span>' +
+      '<div class="rec-top"><span class="tier">' +
+        (tierKey === "match" ? (r.diff < 0.04 ? "匹配偏冲刺" : "匹配偏稳") : m.n) + '</span>' +
         (pr.conv ? '<span class="conv-tag">转码友好</span>' : '') +
         '<span class="ddl">截止 ' + pr.ddl + '</span>' +
         '<button class="star' + (inList(pr) ? " on" : "") + '" data-star="' + esc(pk(pr)) + '" title="加入我的清单" aria-label="加入我的清单">☆</button>' +
@@ -2652,7 +2660,8 @@
                  wan(t*10000) + ' 万</b></div>';
         }).join("") + '</div>' : '') +
       '<div class="rec-meter"><div class="track"><i style="width:' + r.pct + '%"></i></div>' +
-        '<span class="p">匹配度 ' + r.pct + '</span></div>' +
+        '<span class="p">个人匹配度 ' + r.pct + '/100</span></div>' +
+      '<p class="disclaim">匹配度反映"你的背景与项目要求的接近程度"，不是录取概率</p>' +
       '<p class="why">' + esc(whyText(r, evalProfile())) + '</p>' +
       (pr.note ? '<p class="note">' + esc(pr.note) + '</p>' : '') +
       (risk.length ? '<p class="risk">' + esc(risk.join("；")) + '</p>' : '') +
@@ -2661,7 +2670,8 @@
         '你的竞争力 <b>' + P.score.toFixed(2) + '</b> − 项目门槛 <b>' + pr.d.toFixed(2) + '</b> = <b>' + (r.baseDiff >= 0 ? "+" : "") + r.baseDiff.toFixed(2) + '</b>' +
         (r.pen.length ? '<br>扣分：' + r.pen.map(function(x){ return x[0] + " <b>" + x[1].toFixed(2) + '</b>'; }).join('；') : '') +
         '<br>最终差值 <b>' + (r.diff >= 0 ? "+" : "") + r.diff.toFixed(2) + '</b> → 档位（≥0.10 保底 / ≥−0.02 匹配 / ≥−0.13 冲刺）' +
-        '<br>难度锚点：参考录取率 <b>' + admitBand(pr.d) + '</b> · 录取中位 GPA <b>' + pr.gpa.toFixed(2) + '</b> · 语言门槛 <b>' + pr.toefl + '</b>' +
+        '<br>项目难度 <b>' + diffTag(pr.d) + '</b> · 录取中位 GPA <b>' + pr.gpa.toFixed(2) + '</b> · 语言门槛 <b>' + pr.toefl + '</b>' +
+        '<br><span style="color:var(--ink3)">个人匹配度是"你的背景与该项目要求的接近程度"，不是录取概率</span>' +
       '</div></details>' +
       '<div class="foot">' + (progUrl(pr)
           ? '<a href="' + progUrl(pr) + '" target="_blank" rel="noopener">项目页 ↗</a>'
@@ -2840,7 +2850,7 @@
         '<td class="num" data-l="学费/年"><span data-tuit="' + esc(pk(p)) + '" title="点击可改学费" style="cursor:pointer; border-bottom:1px dashed var(--line2)">' + tuitHtml(p) + '</span></td>' +
         '<td class="num" data-l="生活费/年">' + money(p.liv) + '</td>' +
         '<td class="num" data-l="合计">' + wan(total*10000) + ' 万</td>' +
-        '<td data-l="难度" title="参考录取率 ' + admitBand(p.d) + ' · 中位 GPA ' + p.gpa.toFixed(2) + ' · 语言门槛 ' + p.toefl + '">' + diffHtml + '<div style="font-size:9.5px; color:var(--ink3); margin-top:2px">参考 ' + admitBand(p.d) + '</div></td>' +
+        '<td data-l="难度" title="项目难度 · 中位 GPA ' + p.gpa.toFixed(2) + ' · 语言门槛 ' + p.toefl + '">' + diffHtml + '<div style="margin-top:2px">' + diffTag(p.d) + '</div></td>' +
         '<td class="num" data-l="截止">' + p.ddl + '</td>' +
       "</tr>";
     }).join("");
@@ -3471,7 +3481,7 @@
       '</b>（' + esc(best.s) + '）' + (list.length > 40 ? ' · 下面只显示前 40 个' : '') + '</div>';
 
     h += '<div class="table-wrap" style="margin-top:12px"><table class="db"><thead><tr>' +
-      '<th>学校 / 项目</th><th>综排</th><th>城市</th><th>全程合计</th><th>录取率</th><th>标签</th></tr></thead><tbody>';
+      '<th>学校 / 项目</th><th>综排</th><th>城市</th><th>全程合计</th><th>项目难度</th><th>标签</th></tr></thead><tbody>';
     h += shown.map(function(p){
       var tags = [];
       if(p.conv) tags.push("转码");
@@ -3483,7 +3493,7 @@
         '<td class="num">' + (RK(p) ? "#" + RK(p) : "—") + '</td>' +
         '<td class="loc">' + esc(p.city) + ', ' + p.st + '<small>' + REGIONS[p.reg].n + '</small></td>' +
         '<td class="num">' + wan(totalWan(p)*10000) + ' 万</td>' +
-        '<td class="num">' + admitBand(p.d) + '</td>' +
+        '<td class="num">' + diffTag(p.d) + '</td>' +
         '<td style="font-size:11px;color:var(--ink3)">' + (tags.join(" · ") || "—") + '</td>' +
       "</tr>";
     }).join("");
@@ -3731,13 +3741,17 @@
     }
     save(); return true;
   }
-  function admitBand(d){
-    if(d >= 0.88) return "<10%";
-    if(d >= 0.80) return "10–20%";
-    if(d >= 0.70) return "20–35%";
-    if(d >= 0.60) return "35–50%";
-    if(d >= 0.50) return "50–65%";
-    return "65%+";
+  // 项目难度等级：衡量项目本身的门槛，与个人录取概率无关
+  function diffLevel(d){
+    if(d >= 0.88) return {t:"极高", cls:"lv5"};
+    if(d >= 0.78) return {t:"高",   cls:"lv4"};
+    if(d >= 0.66) return {t:"中高", cls:"lv3"};
+    if(d >= 0.52) return {t:"中等", cls:"lv2"};
+    return {t:"较低", cls:"lv1"};
+  }
+  function diffTag(d){
+    var lv = diffLevel(d);
+    return '<span class="lvtag ' + lv.cls + '">' + lv.t + '</span>';
   }
   function renderCmpBar(){
     var bar = document.getElementById("cmpBar");
@@ -3776,7 +3790,7 @@
       if(p.phd) t.push("申博友好");
       return t.length ? t.join(" · ") : "—";
     });
-    h += cmpRow("录取难度", function(p){ return "●".repeat(Math.round(p.d*5)) + "○".repeat(5-Math.round(p.d*5)) + "<br><span style='color:var(--ink3);font-size:11px'>参考录取率 " + admitBand(p.d) + "</span>"; });
+    h += cmpRow("项目难度", function(p){ return "●".repeat(Math.round(p.d*5)) + "○".repeat(5-Math.round(p.d*5)) + " " + diffTag(p.d); });
     h += cmpRow("录取中位 GPA", function(p){ return "<b>" + p.gpa.toFixed(2) + "</b>"; });
     h += cmpRow("语言门槛", function(p){ return "TOEFL <b>" + p.toefl + "</b>"; });
     h += cmpRow("校区", function(p){ return p.camps ? p.camps.length + " 个校区" : "单校区"; });
