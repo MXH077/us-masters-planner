@@ -254,6 +254,12 @@
   details.why2 > div{margin-top:6px; padding:8px 10px; background:#FBF9F4; border:1px solid var(--line); border-radius:8px; line-height:1.75; color:var(--ink2);}
   details.why2 b{font-family:var(--mono); color:var(--ink);}
 
+  .ttag{white-space:nowrap; font-size:9.5px; font-weight:600; padding:1px 6px; border-radius:4px;
+        margin-left:6px; vertical-align:1px; cursor:help; letter-spacing:.02em;}
+  .ttag.t-verified{background:#E8F2EA; color:#2F6B3E; border:1px solid #C9E0CF;}
+  .ttag.t-third{background:#EAF0F8; color:#2F4B7C; border:1px solid #C6D6EA;}
+  .ttag.t-est{background:#F9EFDF; color:#A9661A; border:1px solid #EBD9BC;}
+  .ttag.t-stale{background:#F9E9E7; color:#9B3A32; border:1px solid #EBC7C3;}
   .vfy{white-space:nowrap; font-size:9.5px; font-weight:600; letter-spacing:.03em; padding:1px 6px; border-radius:4px;
        background:#E8F2EA; color:#2F6B3E; border:1px solid #C9E0CF; margin-left:6px; vertical-align:1px; cursor:help;}
   .est{white-space:nowrap; font-size:9.5px; font-weight:600; letter-spacing:.03em; padding:1px 6px; border-radius:4px;
@@ -284,6 +290,10 @@
   table.cmp-t td b{font-family:var(--mono); font-size:12.5px;}
   table.cmp-t tr:hover td{background:#FBF9F4;}
 
+  .trust-bar{display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; padding:10px 14px;
+    background:#FBF9F4; border:1px solid var(--line); border-radius:10px; font-size:12px; color:var(--ink2); margin-bottom:14px;}
+  .trust-bar b{font-family:var(--mono);}
+  .trust-bar .sep{flex:1;}
   /* ---------- DB table ---------- */
   .db-filters{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px;}
   .db-filters .lbl{font-size:11.5px; color:var(--ink3); letter-spacing:.08em; text-transform:uppercase; font-weight:600; margin-right:2px;}
@@ -795,6 +805,7 @@
 
     <section class="panel" id="panel-db" role="tabpanel">
       <div class="sec-title"><h2>项目库</h2><span class="hint">点击表头可排序</span></div>
+      <div class="trust-bar" id="trustBar"></div>
       <p class="sec-sub">共 <b id="dbCount">0</b> 个项目，覆盖 100 余所院校、35 个专业方向。生活费为该校所在城市 MIT Living Wage 实测值（学生口径，见「数据来源」页）；学费为区间参考，带 <span class="est">估算</span> 徽标的是按学校档位批量推算的条目。综排为 <b>US News 2026 版</b>，点击名次可改。</p>
 
       <div class="db-filters">
@@ -826,6 +837,11 @@
         <select id="dbRa" class="mini">
           <option value="">RA/TA 不限</option>
           <option value="1">有 RA/TA 机会</option>
+        </select>
+        <select id="dbTrust" class="mini">
+          <option value="">可信度不限</option>
+          <option value="verified">官方已核实</option>
+          <option value="est">估算数据</option>
         </select>
       </div>
 
@@ -989,6 +1005,14 @@
       <div class="note-box" style="background:#FBF9F4">
         <b>转码标记：</b>只标注<b>明确面向非 CS 本科</b>的项目（MCIT、Align、USC CS-SE、MPCS、Brandeis、DePaul 等），或官方说明提供补修课的（雪城、IIT、UT Dallas、GMU）。
         常规 MS CS 不标——它们通常要求 CS 或强量化背景。若你本科是数学/物理/电子，常规项目也未必不能申，但需要逐校看先修课。
+      </div>
+
+      <div class="sec-title" style="margin-top:26px"><h2>数据可信度分级</h2><span class="hint">记录数 ≠ 核实数</span></div>
+      <div class="card" style="padding:16px 20px; font-size:12.8px; line-height:2; color:var(--ink2)">
+        <div><span class="ttag t-verified">官方已核实</span> 已从项目官网确认 → 可用于正式筛选 <b id="cntVerified">0</b> 条</div>
+        <div><span class="ttag t-third">第三方数据</span> 来自可信统计平台 → 已标明来源 <b id="cntThird">0</b> 条</div>
+        <div><span class="ttag t-est">估算数据</span> 按学校/项目特征推算 → 不参与精确判断 <b id="cntEst">0</b> 条</div>
+        <div><span class="ttag t-stale">待更新</span> 过期或无法确认 → 提醒用户核实 <b id="cntStale">0</b> 条</div>
       </div>
 
       <div class="sec-title" style="margin-top:26px"><h2>更新记录</h2></div>
@@ -2633,8 +2657,7 @@
         '<button class="star cmp' + (inCmp(pr) ? " on" : "") + '" data-cmp="' + esc(pk(pr)) + '" title="加入对比（最多 3 个）" aria-label="加入对比">⇄</button></div>' +
       '<h4>' + schoolLink(pr.s) +
         (RK(pr) ? '<span class="rk" data-rk="' + esc(pr.s) + '" title="US News 综排（2026 版），点击可改">#' + RK(pr) + '</span>' : '') +
-        (pr.vfy ? '<span class="vfy" title="' + esc(pr.vfy) + '">已核实</span>' :
-          (pr.est ? '<span class="est" title="该校该专业为批量推算条目：学费按档位区间，截止日与要求按专业惯例">估算</span>' : '')) +
+        (trustOf(pr) !== "est" ? trustTag(pr) : '') +
       '</h4>' +
       '<p class="prog">' + esc(pr.p) + ' · ' + pr.dur + ' 年</p>' +
       ((pr.int || pr.phd) ? '<p class="ptags">' +
@@ -2763,7 +2786,7 @@
   /* ================= 渲染：项目库 ================= */
   var dbSort = {k:"d", dir:-1};
   var dbLimit = 100;
-  var dbF = {ddl:"", gre:"", dur:"", ra:""};
+  var dbF = {ddl:"", gre:"", dur:"", ra:"", trust:""};
   var dbField = "all";
   var dbQuery = "";
 
@@ -2793,6 +2816,7 @@
       if(dbF.gre && p.gre !== dbF.gre) return false;
       if(dbF.dur && String(p.dur) !== dbF.dur) return false;
       if(dbF.ra === "1" && !p.phd) return false;
+      if(dbF.trust && trustOf(p) !== dbF.trust) return false;
       return true;
     });
 
@@ -2839,7 +2863,7 @@
       return "<tr>" +
         '<td data-l="项目" style="display:flex; gap:6px; align-items:flex-start"><button class="star' + (inList(p) ? " on" : "") + '" data-star="' + esc(pk(p)) + '" title="加入我的清单" aria-label="加入我的清单">☆</button>' +
         '<button class="star cmp' + (inCmp(p) ? " on" : "") + '" data-cmp="' + esc(pk(p)) + '" title="加入对比" aria-label="加入对比">⇄</button><span style="min-width:0">' +
-        '<span class="uni">' + schoolLink(p.s) + (p.vfy ? '<span class="vfy" title="' + esc(p.vfy) + '">已核实</span>' : (p.est ? '<span class="est">估算</span>' : '')) + '</span><span class="pgm">' + esc(p.p) + ' · ' + p.dur + ' 年' +
+        '<span class="uni">' + schoolLink(p.s) + trustTag(p) + '</span><span class="pgm">' + esc(p.p) + ' · ' + p.dur + ' 年' +
           (p.conv ? ' <span class="conv-tag" style="font-size:9.5px">转码</span>' : '') +
           (p.int ? ' <span class="ptag int" style="font-size:9.5px" title="' + esc(p.intWhy || '') + '">实习</span>' : '') +
           (p.phd ? ' <span class="ptag phd" style="font-size:9.5px" title="' + esc(p.phdWhy || '') + '">申博</span>' : '') +
@@ -2862,6 +2886,20 @@
 
     $("#dbTable").innerHTML = h;
     $("#dbCount").textContent = rows.length;
+
+    var tb = document.getElementById("trustBar");
+    if(tb){
+      var c = {verified:0, third:0, est:0, stale:0};
+      PROGRAMS.forEach(function(p){ c[trustOf(p)]++; });
+      tb.innerHTML =
+        '<span>全库 <b>' + PROGRAMS.length + '</b> 条</span>' +
+        '<span><span class="ttag t-verified">官方已核实</span> <b>' + c.verified + '</b></span>' +
+        '<span><span class="ttag t-third">第三方数据</span> <b>' + c.third + '</b></span>' +
+        '<span><span class="ttag t-est">估算数据</span> <b>' + c.est + '</b></span>' +
+        '<span><span class="ttag t-stale">待更新</span> <b>' + c.stale + '</b></span>' +
+        '<span class="sep"></span>' +
+        '<span style="color:var(--ink3)">记录数 ≠ 核实数：只有"官方已核实"可用于正式判断</span>';
+    }
     var more = document.getElementById("dbMore");
     if(more){
       more.style.display = rows.length > shown.length ? "" : "none";
@@ -3335,7 +3373,7 @@
       $$("#dbFields .chip").forEach(function(c){ c.setAttribute("aria-pressed", c === b); });
       renderDB();
     });
-    [["dbDdl","ddl"],["dbGre","gre"],["dbDur","dur"],["dbRa","ra"]].forEach(function(pair){
+    [["dbDdl","ddl"],["dbGre","gre"],["dbDur","dur"],["dbRa","ra"],["dbTrust","trust"]].forEach(function(pair){
       var el = document.getElementById(pair[0]);
       if(!el) return;
       el.addEventListener("change", function(){
@@ -3393,6 +3431,13 @@
 
 
   function renderSources(){
+    var tc = {verified:0, third:0, est:0, stale:0};
+    PROGRAMS.forEach(function(p){ tc[trustOf(p)]++; });
+    var map = {cntVerified:"verified", cntThird:"third", cntEst:"est", cntStale:"stale"};
+    Object.keys(map).forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.textContent = tc[map[id]];
+    });
     var dl = document.getElementById("detailList");
     if(dl){
       var rows = PROGRAMS.filter(function(p){ return !p.est; });
@@ -3401,7 +3446,7 @@
         rows.map(function(p){
           return '<tr><td style="padding:4px 6px;border-top:1px solid var(--line)">' + esc(p.s) + ' · ' + esc(p.p).slice(0,34) + '</td>' +
             '<td style="padding:4px 6px;border-top:1px solid var(--line);text-align:right;font-family:var(--mono)">' + money(TUIT(p)) + '</td>' +
-            '<td style="padding:4px 6px;border-top:1px solid var(--line)">' + (p.vfy ? '<span class="vfy">已核实</span>' : '区间参考') + '</td>' +
+            '<td style="padding:4px 6px;border-top:1px solid var(--line)">' + trustTag(p) + '</td>' +
             '<td style="padding:4px 6px;border-top:1px solid var(--line)"><a href="' + srcUrl(p) + '" target="_blank" rel="noopener" style="color:var(--green);font-size:11px">' + (p.vsrc ? '官网' : '查证') + ' ↗</a></td></tr>';
         }).join("") + '</table>';
     }
@@ -3488,7 +3533,7 @@
       if(p.int) tags.push("实习");
       if(p.phd) tags.push("申博");
       return "<tr>" +
-        '<td><span class="uni">' + schoolLink(p.s) + (p.vfy ? '<span class="vfy">已核实</span>' : (p.est ? '<span class="est">估算</span>' : '')) + '</span>' +
+        '<td><span class="uni">' + schoolLink(p.s) + trustTag(p) + '</span>' +
         '<span class="pgm">' + esc(p.p) + ' · ' + p.dur + ' 年</span></td>' +
         '<td class="num">' + (RK(p) ? "#" + RK(p) : "—") + '</td>' +
         '<td class="loc">' + esc(p.city) + ', ' + p.st + '<small>' + REGIONS[p.reg].n + '</small></td>' +
@@ -3563,7 +3608,7 @@
       var cls = d === null ? "done" : (d < 0 ? "done" : d < 30 ? "hot" : d < 90 ? "warm" : "");
       var dTxt = d === null ? "滚动" : (d < 0 ? "已过" : d + " 天");
       return "<tr>" +
-        '<td data-l="项目"><span style="font-weight:600">' + esc(p.s) + '</span><span class="pgm">' + esc(p.p) + ' · ' + p.dur + ' 年</span></td>' +
+        '<td data-l="项目"><span style="font-weight:600">' + esc(p.s) + '</span>' + trustTag(p) + '<span class="pgm">' + esc(p.p) + ' · ' + p.dur + ' 年</span></td>' +
         '<td class="num" data-l="综排">' + (RK(p) ? "#" + RK(p) : "—") + '</td>' +
         '<td data-l="CS 先修"><span class="ptag pre-' + p.pre + '" style="font-size:10px">' + (PRE_LABEL[p.pre] || "—") + '</span></td>' +
         '<td class="num" data-l="截止">' + p.ddl + '</td>' +
@@ -3741,6 +3786,24 @@
     }
     save(); return true;
   }
+  // ===== 数据可信度四级 =====
+  var TRUST = {
+    verified:{n:"官方已核实", cls:"t-verified", d:"已从项目官网确认，可用于正式筛选"},
+    third:   {n:"第三方数据", cls:"t-third",    d:"来自可信统计平台，已标明来源"},
+    est:     {n:"估算数据",   cls:"t-est",      d:"按学校或项目特征推算，不参与精确判断"},
+    stale:   {n:"待更新",     cls:"t-stale",    d:"数据过期或无法确认，需自行核实"}
+  };
+  function trustOf(p){
+    if(p.vfy) return "verified";
+    if(p.third) return "third";
+    if(p.stale) return "stale";
+    return "est";
+  }
+  function trustTag(p){
+    var k = trustOf(p), t = TRUST[k];
+    return '<span class="ttag ' + t.cls + '" title="' + t.d + '">' + t.n + '</span>';
+  }
+
   // 项目难度等级：衡量项目本身的门槛，与个人录取概率无关
   function diffLevel(d){
     if(d >= 0.88) return {t:"极高", cls:"lv5"};
@@ -3794,7 +3857,7 @@
     h += cmpRow("录取中位 GPA", function(p){ return "<b>" + p.gpa.toFixed(2) + "</b>"; });
     h += cmpRow("语言门槛", function(p){ return "TOEFL <b>" + p.toefl + "</b>"; });
     h += cmpRow("校区", function(p){ return p.camps ? p.camps.length + " 个校区" : "单校区"; });
-    h += cmpRow("数据", function(p){ return p.vfy ? "<span class='vfy'>已核实</span>" : (p.est ? "<span class='est'>估算</span>" : "参考"); });
+    h += cmpRow("数据可信度", function(p){ return trustTag(p); });
     h += "</tbody></table>";
     document.getElementById("cmpBody").innerHTML = h;
     document.getElementById("cmpModal").hidden = false;
