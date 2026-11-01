@@ -96,6 +96,12 @@
   .pf{padding:24px 26px;}
   .pf-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px 18px;}
   .span3{grid-column:1 / -1;}
+  .mini-grid{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:9px;}
+  .mini{display:flex; flex-direction:column; gap:3px; min-width:0;}
+  .mini span{font-size:10.5px; color:var(--ink3);}
+  .mini select{font:inherit; font-size:12.5px; padding:6px 7px; border:1px solid var(--line2);
+    border-radius:8px; background:#fff; color:var(--ink); width:100%;}
+  @media (max-width:900px){ .mini-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
   .fld{display:flex; flex-direction:column; gap:6px; min-width:0;}
   .fld > label{font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink3); font-weight:600;}
   .fld select, .fld input{
@@ -601,27 +607,54 @@
             <span class="sub">含学费 + 生活费，按整个学制计算</span>
           </div>
 
-          <div class="fld">
-            <label for="fResearch">科研与项目</label>
-            <select id="fResearch">
-              <option value="none">没有科研或项目</option>
-              <option value="course" selected>课程项目 / 课程设计</option>
-              <option value="intern">实习项目（有产出）</option>
-              <option value="ra">校级科研 / 助研</option>
-              <option value="paper">论文 / 顶会 / 专利</option>
-            </select>
-            <span class="sub">权重 25%，CS 申请里这段最能拉开差距</span>
-          </div>
-
-          <div class="fld">
-            <label for="fMatch">专业匹配度</label>
-            <select id="fMatch">
-              <option value="cs" selected>CS / 软件工程本科</option>
-              <option value="related">相关专业（电子 / 数学 / 统计）</option>
-              <option value="bridge">跨专业，但修过先修课</option>
-              <option value="none">跨专业，无先修课</option>
-            </select>
-            <span class="sub">权重 20%，看先修课与编程/数学基础</span>
+          <div class="fld span3">
+            <label>课程与经历 <span style="font-weight:400; color:var(--ink3); text-transform:none; letter-spacing:0">— 决定「科研 25%」和「匹配 20%」两项</span></label>
+            <div class="mini-grid">
+              <div class="mini"><span>编程能力</span>
+                <select id="fProg">
+                  <option value="weak">较弱</option>
+                  <option value="mid" selected>一般</option>
+                  <option value="strong">较强</option>
+                </select>
+              </div>
+              <div class="mini"><span>数据结构与算法</span>
+                <select id="fDsa">
+                  <option value="0" selected>未修</option>
+                  <option value="1">已修 / 掌握</option>
+                </select>
+              </div>
+              <div class="mini"><span>ML / DL 项目</span>
+                <select id="fMl">
+                  <option value="0" selected>0 个</option>
+                  <option value="1">1 个</option>
+                  <option value="2">2 个及以上</option>
+                </select>
+              </div>
+              <div class="mini"><span>科研论文</span>
+                <select id="fPaper">
+                  <option value="none" selected>无</option>
+                  <option value="submitted">在投</option>
+                  <option value="published">已发表</option>
+                  <option value="top">顶会 / 顶刊</option>
+                </select>
+              </div>
+              <div class="mini"><span>实习</span>
+                <select id="fIntern">
+                  <option value="0" selected>无</option>
+                  <option value="1">1 段</option>
+                  <option value="2">2 段及以上</option>
+                </select>
+              </div>
+              <div class="mini"><span>推荐信</span>
+                <select id="fLor">
+                  <option value="weak" selected>一般（课程老师）</option>
+                  <option value="mid">较强（科研导师）</option>
+                  <option value="strong">很强（领域内知名）</option>
+                </select>
+              </div>
+            </div>
+            <div class="chip-row" id="fMath" style="margin-top:10px"></div>
+            <span class="sub">数学课程（多选）：线性代数 / 概率统计 / 微积分 / 离散数学</span>
           </div>
 
           <div class="fld">
@@ -662,8 +695,13 @@
           <details class="formula"><summary>评分公式与分档规则</summary>
             <div class="body">
               竞争力 = <b>0.25</b>×GPA + <b>0.25</b>×科研项目 + <b>0.20</b>×专业匹配 + <b>0.10</b>×语言 + <b>0.10</b>×本科背景 + <b>0.10</b>×GRE<br>
-              · 科研分：无 0.15 / 课程项目 0.35 / 实习项目 0.55 / 助研 0.72 / 论文或专利 0.90<br>
-              · 匹配分：CS 本科 1.00 / 相关专业 0.75 / 跨专业但修过先修 0.55 / 跨专业无先修 0.25<br>
+              <br><b>科研分</b> = 0.35×论文（无 0.10 / 在投 0.45 / 已发表 0.75 / 顶会 1.00）
+              + 0.25×ML项目（0 个 0.10 / 1 个 0.55 / 2+ 1.00）
+              + 0.20×实习（无 0.15 / 1 段 0.55 / 2+ 0.85）
+              + 0.20×推荐信（一般 0.35 / 较强 0.65 / 很强 0.90）<br>
+              <b>匹配分</b> = 0.45×编程（弱 0.25 / 一般 0.60 / 较强 0.95）
+              + 0.35×数学覆盖（线代 0.30 + 概率 0.30 + 微积分 0.20 + 离散 0.20，上限 1.0）
+              + 0.20×数据结构与算法（已修 1 / 未修 0）<br>
               · GPA分 = (GPA − 2.8) / 1.2，截断在 0–1<br>
               · 语言分 = (TOEFL − 79) / 41，截断在 0–1；未填按 0.22<br>
               · 院校分：海本 0.95 / 985 1.00 / 中外合办 0.85 / 211 0.72 / 双非 0.42<br>
@@ -2296,7 +2334,7 @@
 
   /* ================= 状态 ================= */
   var STORE = "us-ms.v1";
-  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", research:"course", match:"cs", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
+  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", prog:"mid", dsa:0, math:[], ml:"0", paper:"none", intern:"0", lor:"weak", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
 
   var state = load();
   function load(){
@@ -2411,10 +2449,28 @@
     var gpaN = clamp((gpa4-2.8)/1.2, 0, 1);
     var toeflN = toefl ? clamp((toefl-79)/41, 0, 1) : 0.22;
 
-    var RES_N = {none:0.15, course:0.35, intern:0.55, ra:0.72, paper:0.90};
-    var MATCH_N = {cs:1.00, related:0.75, bridge:0.55, none:0.25};
-    var resN = RES_N[state.research] != null ? RES_N[state.research] : 0.35;
-    var matchN = MATCH_N[state.match] != null ? MATCH_N[state.match] : 0.55;
+    // 匹配分 = 0.45×编程 + 0.35×数学课覆盖 + 0.20×数据结构与算法
+    var PROG_N = {weak:0.25, mid:0.60, strong:0.95};
+    var progN = PROG_N[state.prog] != null ? PROG_N[state.prog] : 0.60;
+    var mathArr = state.math || [];
+    var mathCov = 0;
+    if(mathArr.indexOf("la") > -1) mathCov += 0.30;
+    if(mathArr.indexOf("prob") > -1) mathCov += 0.30;
+    if(mathArr.indexOf("calc") > -1) mathCov += 0.20;
+    if(mathArr.indexOf("disc") > -1) mathCov += 0.20;
+    mathCov = Math.min(1, mathCov);
+    var dsaN = String(state.dsa) === "1" ? 1 : 0;
+    var matchN = 0.45*progN + 0.35*mathCov + 0.20*dsaN;
+
+    // 科研分 = 0.35×论文 + 0.25×ML项目 + 0.20×实习 + 0.20×推荐信
+    var PAPER_N = {none:0.10, submitted:0.45, published:0.75, top:1.00};
+    var ML_N = {"0":0.10, "1":0.55, "2":1.00};
+    var INTERN_N = {"0":0.15, "1":0.55, "2":0.85};
+    var LOR_N = {weak:0.35, mid:0.65, strong:0.90};
+    var resN = 0.35*(PAPER_N[state.paper] != null ? PAPER_N[state.paper] : 0.10)
+             + 0.25*(ML_N[String(state.ml)] != null ? ML_N[String(state.ml)] : 0.10)
+             + 0.20*(INTERN_N[String(state.intern)] != null ? INTERN_N[String(state.intern)] : 0.15)
+             + 0.20*(LOR_N[state.lor] != null ? LOR_N[state.lor] : 0.35);
 
     // 六维：GPA 25% / 科研项目 25% / 专业匹配 20% / 语言 10% / 本科 10% / GRE 10%
     var score = 0.25*gpaN + 0.25*resN + 0.20*matchN + 0.10*toeflN + 0.10*schoolN + 0.10*greN;
@@ -2634,12 +2690,10 @@
     $("#compV").textContent = Math.round(P.score*100);
     $("#compL").textContent = "竞争力 · " + P.label;
 
-    var RES_L = {none:"无", course:"课程项目", intern:"实习项目", ra:"助研", paper:"论文/专利"};
-    var MATCH_L = {cs:"CS 本科", related:"相关专业", bridge:"跨专业+先修", none:"跨专业无先修"};
     var bars = [
       {t:"GPA", v:P.gpaN, n:P.gpa4.toFixed(2), w:0.25, warn:P.gpaN < 0.5},
-      {t:"科研", v:P.resN, n:RES_L[state.research] || "—", w:0.25, warn:P.resN < 0.4},
-      {t:"匹配", v:P.matchN, n:MATCH_L[state.match] || "—", w:0.20, warn:P.matchN < 0.6},
+      {t:"科研", v:P.resN, n:Math.round(P.resN*100) + "", w:0.25, warn:P.resN < 0.4},
+      {t:"匹配", v:P.matchN, n:Math.round(P.matchN*100) + "", w:0.20, warn:P.matchN < 0.6},
       {t:"语言", v:P.toeflN, n:P.toefl ? "T" + P.toefl : "未填", w:0.10, warn:P.toeflN < 0.45},
       {t:"院校", v:P.schoolN, n:SCHOOL_LABEL[state.school], w:0.10, warn:P.schoolN < 0.7},
       {t:"GRE", v:P.greN, n:P.greYes ? "Q" + P.greQ : "未考", w:0.10, warn:false}
@@ -3053,8 +3107,17 @@
     $("#fToefl").value = state.toefl;
     $("#fGre").value = state.gre;
     $("#fGreQ").value = state.greQ;
-    $("#fResearch").value = state.research || "course";
-    $("#fMatch").value = state.match || "cs";
+    $("#fProg").value = state.prog || "mid";
+    $("#fDsa").value = String(state.dsa || 0);
+    $("#fMl").value = String(state.ml != null ? state.ml : "0");
+    $("#fPaper").value = state.paper || "none";
+    $("#fIntern").value = String(state.intern != null ? state.intern : "0");
+    $("#fLor").value = state.lor || "weak";
+    $("#fMath").innerHTML = [["la","线性代数"],["prob","概率统计"],["calc","微积分"],["disc","离散数学"]]
+      .map(function(x){
+        return '<button class="chip sm" data-math="' + x[0] + '" aria-pressed="' +
+          ((state.math||[]).indexOf(x[0]) > -1) + '">' + x[1] + '</button>';
+      }).join("");
     $("#fBudget").value = state.budget;
 
     $("#fFields").innerHTML = Object.keys(FIELDS).map(function(k){
@@ -3090,8 +3153,20 @@
       clearTimeout(window.__tT);
       window.__tT = setTimeout(renderMatch, 220);
     });
-    $("#fResearch").addEventListener("change", function(){ state.research = this.value; save(); renderMatch(); });
-    $("#fMatch").addEventListener("change", function(){ state.match = this.value; save(); renderMatch(); });
+    [["fProg","prog"],["fDsa","dsa"],["fMl","ml"],["fPaper","paper"],["fIntern","intern"],["fLor","lor"]]
+      .forEach(function(pair){
+        var el = document.getElementById(pair[0]);
+        if(!el) return;
+        el.addEventListener("change", function(){ state[pair[1]] = this.value; save(); renderMatch(); });
+      });
+    document.getElementById("fMath").addEventListener("click", function(e){
+      var b = e.target.closest("[data-math]"); if(!b) return;
+      var v = b.dataset.math;
+      if(!state.math) state.math = [];
+      var i = state.math.indexOf(v);
+      if(i > -1) state.math.splice(i,1); else state.math.push(v);
+      save(); syncForm(); renderMatch();
+    });
 
     $("#fGre").addEventListener("change", function(){
       state.gre = this.value; save(); syncForm(); renderMatch();
@@ -3142,7 +3217,9 @@
       state.gpa = DEFAULT.gpa; state.scale = DEFAULT.scale;
       state.toefl = DEFAULT.toefl; state.gre = DEFAULT.gre; state.greQ = DEFAULT.greQ;
       state.budget = DEFAULT.budget; state.regions = [];
-      state.research = DEFAULT.research; state.match = DEFAULT.match;
+      state.prog = DEFAULT.prog; state.dsa = DEFAULT.dsa; state.math = [];
+      state.ml = DEFAULT.ml; state.paper = DEFAULT.paper;
+      state.intern = DEFAULT.intern; state.lor = DEFAULT.lor;
       save(); syncForm(); renderMatch();
     });
   }
