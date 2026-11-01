@@ -602,6 +602,29 @@
           </div>
 
           <div class="fld">
+            <label for="fResearch">科研与项目</label>
+            <select id="fResearch">
+              <option value="none">没有科研或项目</option>
+              <option value="course" selected>课程项目 / 课程设计</option>
+              <option value="intern">实习项目（有产出）</option>
+              <option value="ra">校级科研 / 助研</option>
+              <option value="paper">论文 / 顶会 / 专利</option>
+            </select>
+            <span class="sub">权重 25%，CS 申请里这段最能拉开差距</span>
+          </div>
+
+          <div class="fld">
+            <label for="fMatch">专业匹配度</label>
+            <select id="fMatch">
+              <option value="cs" selected>CS / 软件工程本科</option>
+              <option value="related">相关专业（电子 / 数学 / 统计）</option>
+              <option value="bridge">跨专业，但修过先修课</option>
+              <option value="none">跨专业，无先修课</option>
+            </select>
+            <span class="sub">权重 20%，看先修课与编程/数学基础</span>
+          </div>
+
+          <div class="fld">
             <label>地区偏好（不选 = 不限）</label>
             <div class="chip-row" id="fRegions"></div>
             <span class="sub">选了就只看这些地区的项目</span>
@@ -638,7 +661,9 @@
           <div class="pct" id="compPct"></div>
           <details class="formula"><summary>评分公式与分档规则</summary>
             <div class="body">
-              竞争力 = <b>0.45</b> × GPA分 + <b>0.30</b> × 语言分 + <b>0.15</b> × 院校分 + <b>0.10</b> × GRE分<br>
+              竞争力 = <b>0.25</b>×GPA + <b>0.25</b>×科研项目 + <b>0.20</b>×专业匹配 + <b>0.10</b>×语言 + <b>0.10</b>×本科背景 + <b>0.10</b>×GRE<br>
+              · 科研分：无 0.15 / 课程项目 0.35 / 实习项目 0.55 / 助研 0.72 / 论文或专利 0.90<br>
+              · 匹配分：CS 本科 1.00 / 相关专业 0.75 / 跨专业但修过先修 0.55 / 跨专业无先修 0.25<br>
               · GPA分 = (GPA − 2.8) / 1.2，截断在 0–1<br>
               · 语言分 = (TOEFL − 79) / 41，截断在 0–1；未填按 0.22<br>
               · 院校分：海本 0.95 / 985 1.00 / 中外合办 0.85 / 211 0.72 / 双非 0.42<br>
@@ -2271,7 +2296,7 @@
 
   /* ================= 状态 ================= */
   var STORE = "us-ms.v1";
-  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
+  var DEFAULT = {school:"985", fields:["cs"], gpa:"3.60", scale:"4", toefl:"100", gre:"no", greQ:"165", research:"course", match:"cs", budget:"100", regions:[], intake:"2027-09", checks:{}, ranks:{}, only:{conv:0,int:0,phd:0,noncs:0}, shortlist:[], tuition:{}, costMode:'year', compare:[], rev:{regions:[],budget:'100',city:'any',stay:'any',fields:[]}};
 
   var state = load();
   function load(){
@@ -2386,7 +2411,13 @@
     var gpaN = clamp((gpa4-2.8)/1.2, 0, 1);
     var toeflN = toefl ? clamp((toefl-79)/41, 0, 1) : 0.22;
 
-    var score = 0.45*gpaN + 0.30*toeflN + 0.15*schoolN + 0.10*greN;
+    var RES_N = {none:0.15, course:0.35, intern:0.55, ra:0.72, paper:0.90};
+    var MATCH_N = {cs:1.00, related:0.75, bridge:0.55, none:0.25};
+    var resN = RES_N[state.research] != null ? RES_N[state.research] : 0.35;
+    var matchN = MATCH_N[state.match] != null ? MATCH_N[state.match] : 0.55;
+
+    // 六维：GPA 25% / 科研项目 25% / 专业匹配 20% / 语言 10% / 本科 10% / GRE 10%
+    var score = 0.25*gpaN + 0.25*resN + 0.20*matchN + 0.10*toeflN + 0.10*schoolN + 0.10*greN;
 
     var label = score >= 0.78 ? "强（前 10%）"
               : score >= 0.66 ? "中上（前 25%）"
@@ -2395,7 +2426,7 @@
               : "偏弱，需补短板";
 
     return {gpa4:gpa4, toefl:toefl, greYes:greYes, greQ:greQ, schoolN:schoolN, greN:greN,
-            gpaN:gpaN, toeflN:toeflN, score:score, label:label};
+            gpaN:gpaN, toeflN:toeflN, resN:resN, matchN:matchN, score:score, label:label};
   }
 
   /* ================= 推荐引擎 ================= */
@@ -2476,10 +2507,10 @@
       }
     }
 
-    var reach = claim(sortByD(rows.filter(function(r){ return r.diff >= -0.18 && r.diff < -0.02; })), 3);
+    var reach = claim(sortByD(rows.filter(function(r){ return r.diff >= -0.13 && r.diff < -0.02; })), 3);
 
     if(reach.length < 2){
-      var r3 = rows.filter(function(r){ return !used[key(r)] && r.diff < 0 && r.diff >= -0.28; })
+      var r3 = rows.filter(function(r){ return !used[key(r)] && r.diff < 0 && r.diff >= -0.20; })
         .sort(function(a,b){ return b.diff - a.diff; });
       while(reach.length < 3 && r3.length){
         var x3 = r3.shift(); x3.filled = "reach"; used[key(x3)] = 1; reach.push(x3);
@@ -2573,7 +2604,7 @@
       '<details class="why2"><summary>为什么是这个档位</summary><div>' +
         '你的竞争力 <b>' + P.score.toFixed(2) + '</b> − 项目门槛 <b>' + pr.d.toFixed(2) + '</b> = <b>' + (r.baseDiff >= 0 ? "+" : "") + r.baseDiff.toFixed(2) + '</b>' +
         (r.pen.length ? '<br>扣分：' + r.pen.map(function(x){ return x[0] + " <b>" + x[1].toFixed(2) + '</b>'; }).join('；') : '') +
-        '<br>最终差值 <b>' + (r.diff >= 0 ? "+" : "") + r.diff.toFixed(2) + '</b> → 档位（≥0.10 保底 / ≥−0.02 匹配 / ≥−0.18 冲刺）' +
+        '<br>最终差值 <b>' + (r.diff >= 0 ? "+" : "") + r.diff.toFixed(2) + '</b> → 档位（≥0.10 保底 / ≥−0.02 匹配 / ≥−0.13 冲刺）' +
         '<br>难度锚点：参考录取率 <b>' + admitBand(pr.d) + '</b> · 录取中位 GPA <b>' + pr.gpa.toFixed(2) + '</b> · 语言门槛 <b>' + pr.toefl + '</b>' +
       '</div></details>' +
       '<div class="foot">' + (progUrl(pr)
@@ -2603,10 +2634,14 @@
     $("#compV").textContent = Math.round(P.score*100);
     $("#compL").textContent = "竞争力 · " + P.label;
 
+    var RES_L = {none:"无", course:"课程项目", intern:"实习项目", ra:"助研", paper:"论文/专利"};
+    var MATCH_L = {cs:"CS 本科", related:"相关专业", bridge:"跨专业+先修", none:"跨专业无先修"};
     var bars = [
-      {t:"GPA", v:P.gpaN, n:P.gpa4.toFixed(2), w:0.45, warn:P.gpaN < 0.5},
-      {t:"语言", v:P.toeflN, n:P.toefl ? "T" + P.toefl : "未填", w:0.30, warn:P.toeflN < 0.45},
-      {t:"院校", v:P.schoolN, n:SCHOOL_LABEL[state.school], w:0.15, warn:P.schoolN < 0.7},
+      {t:"GPA", v:P.gpaN, n:P.gpa4.toFixed(2), w:0.25, warn:P.gpaN < 0.5},
+      {t:"科研", v:P.resN, n:RES_L[state.research] || "—", w:0.25, warn:P.resN < 0.4},
+      {t:"匹配", v:P.matchN, n:MATCH_L[state.match] || "—", w:0.20, warn:P.matchN < 0.6},
+      {t:"语言", v:P.toeflN, n:P.toefl ? "T" + P.toefl : "未填", w:0.10, warn:P.toeflN < 0.45},
+      {t:"院校", v:P.schoolN, n:SCHOOL_LABEL[state.school], w:0.10, warn:P.schoolN < 0.7},
       {t:"GRE", v:P.greN, n:P.greYes ? "Q" + P.greQ : "未考", w:0.10, warn:false}
     ];
     $("#compBars").innerHTML = bars.map(function(b){
@@ -3018,6 +3053,8 @@
     $("#fToefl").value = state.toefl;
     $("#fGre").value = state.gre;
     $("#fGreQ").value = state.greQ;
+    $("#fResearch").value = state.research || "course";
+    $("#fMatch").value = state.match || "cs";
     $("#fBudget").value = state.budget;
 
     $("#fFields").innerHTML = Object.keys(FIELDS).map(function(k){
@@ -3053,6 +3090,9 @@
       clearTimeout(window.__tT);
       window.__tT = setTimeout(renderMatch, 220);
     });
+    $("#fResearch").addEventListener("change", function(){ state.research = this.value; save(); renderMatch(); });
+    $("#fMatch").addEventListener("change", function(){ state.match = this.value; save(); renderMatch(); });
+
     $("#fGre").addEventListener("change", function(){
       state.gre = this.value; save(); syncForm(); renderMatch();
     });
@@ -3102,6 +3142,7 @@
       state.gpa = DEFAULT.gpa; state.scale = DEFAULT.scale;
       state.toefl = DEFAULT.toefl; state.gre = DEFAULT.gre; state.greQ = DEFAULT.greQ;
       state.budget = DEFAULT.budget; state.regions = [];
+      state.research = DEFAULT.research; state.match = DEFAULT.match;
       save(); syncForm(); renderMatch();
     });
   }
