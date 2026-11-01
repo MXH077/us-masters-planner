@@ -518,6 +518,33 @@
     #dbTable .loc small{display:block;}
   }
 
+  /* ---------- Dossier ---------- */
+  .dos-box{max-width:760px;}
+  .dos-body{padding:18px 24px 26px; overflow:auto;}
+  .dos-trust{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px;
+    padding-bottom:14px; border-bottom:1px solid var(--line);}
+  .dos-fresh{font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;}
+  .dos-fresh.t-verified{background:#E8F2EA; color:#2F6B3E;}
+  .dos-fresh.t-est{background:#F9EFDF; color:#A9661A;}
+  .dos-fresh.t-stale{background:#F9E9E7; color:#9B3A32;}
+  .dos-link{margin-left:auto; font-size:12px; color:var(--green); text-decoration:none; border-bottom:1px solid #BBD3CB;}
+  .dos-sec{font-size:11px; letter-spacing:.09em; color:var(--ink3);
+    margin:18px 0 6px; padding-bottom:5px; border-bottom:1px solid var(--line); font-weight:600;}
+  .dos-sec .n2{letter-spacing:0; font-weight:400; margin-left:6px;}
+  .dos-row{display:flex; gap:16px; padding:6px 0; font-size:13px; border-bottom:1px dashed #EEEBE3;}
+  .dos-row .k{flex:0 0 118px; color:var(--ink3); font-size:12px;}
+  .dos-row .v{flex:1; min-width:0; color:var(--ink);}
+  .dos-row .n{display:block; font-size:11px; color:var(--ink3); margin-top:2px;}
+  .miss{color:#A8A296; font-style:italic;}
+  .dos-cost{width:100%; border-collapse:collapse; font-size:13px;}
+  .dos-cost th{text-align:left; font-weight:500; color:var(--ink2); padding:6px 0; border-bottom:1px dashed #EEEBE3;}
+  .dos-cost td{text-align:right; font-family:var(--mono); padding:6px 0; border-bottom:1px dashed #EEEBE3;}
+  .dos-cost td .n{font-family:var(--sans); font-size:10.5px; color:var(--ink3); margin-left:4px;}
+  .dos-cost tr.sum th, .dos-cost tr.sum td{border-bottom:none; border-top:1px solid var(--line2); font-weight:600; padding-top:9px;}
+  .dos-src{font-size:11px; color:var(--ink3); margin-top:8px;}
+  .dos-src a{color:var(--green);}
+  @media (max-width:700px){ .dos-box{width:100%; max-height:92vh;} .dos-row .k{flex:0 0 88px;} }
+
   @media print{
     body.print-short .hero, body.print-short .tabs, body.print-short .pf{display:none !important;}
     body.print-short .panel{display:none !important;}
@@ -1036,6 +1063,8 @@
   </main>
 
 
+<div id="dossier" class="cmp-modal" hidden></div>
+
 <div class="cmp-bar" id="cmpBar" hidden>
   <span>已选 <b id="cmpN">0</b> / 3</span>
   <button class="btn primary" id="cmpOpen">并排对比</button>
@@ -1116,9 +1145,9 @@
     // ---------- CS ----------
     {s:"MIT", p:"SM in Computer Science (EECS)", city:"Cambridge", st:"MA", reg:"northeast", ct:"大城市", tuit:61000, liv:32243, lw:"25017", dur:2, d:0.90, gpa:3.90, toefl:100, gre:"opt", ddl:"12/15", f:"cs",rk:2, phd:1, phdWhy:"研究型学位，博士跳板", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"录取极度看重科研产出，陆本直申成功率很低"},
     {s:"Stanford", p:"MS in Computer Science", city:"Palo Alto", st:"CA", reg:"west", ct:"大城市", tuit:65000, liv:36694, lw:"06085", dur:2, d:0.89, gpa:3.90, toefl:100, gre:"opt", ddl:"12/02", f:"cs",rk:4, phd:1, phdWhy:"研究导向，可衔接博士", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"偏好有顶会论文或硅谷实习的申请者"},
-    {s:"Carnegie Mellon", p:"MS in Computer Science", city:"Pittsburgh", st:"PA", reg:"northeast", ct:"中型城市", tuit:61500, liv:22256, lw:"42003", dur:1.5, d:0.87, gpa:3.85, toefl:105, gre:"opt", ddl:"12/09", f:"cs",rk:21,camps:[{"n": "匹兹堡（主校区）", "city": "Pittsburgh", "st": "PA", "tuit": 61500, "liv": 22256}, {"n": "硅谷（山景城）", "city": "Mountain View", "st": "CA", "tuit": 61500, "liv": 36694}], phd:1, phdWhy:"研究型，可选论文", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", vfy:"官网：录取者 TOEFL 多在 105–114；SCS 最终截止 12/9（早轮 11/18）", vsrc:"https://www.cs.cmu.edu/academics/graduate-admissions", note:"竞争极端激烈，可同时考虑 MCDS / MSAII / INI 等 track"},
+    {s:"Carnegie Mellon", p:"MS in Computer Science", city:"Pittsburgh", st:"PA", reg:"northeast", ct:"中型城市", tuit:61500, liv:22256, lw:"42003", dur:1.5, d:0.87, gpa:3.85, toefl:105, gre:"opt", ddl:"12/09", f:"cs",rk:21,camps:[{"n": "匹兹堡（主校区）", "city": "Pittsburgh", "st": "PA", "tuit": 61500, "liv": 22256}, {"n": "硅谷（山景城）", "city": "Mountain View", "st": "CA", "tuit": 61500, "liv": 36694}], phd:1, phdWhy:"研究型，可选论文", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", vfy:"官网：录取者 TOEFL 多在 105–114；SCS 最终截止 12/9（早轮 11/18）", vsrc:"https://www.cs.cmu.edu/academics/graduate-admissions", note:"竞争极端激烈，可同时考虑 MCDS / MSAII / INI 等 track",checked:"2026-10-28"},
     {s:"UC Berkeley", p:"MEng in EECS", city:"Berkeley", st:"CA", reg:"west", ct:"大城市", tuit:70000, liv:31541, lw:"06001", dur:1, d:0.85, gpa:3.80, toefl:100, gre:"opt", ddl:"01/06", f:"cs",rk:17, int:1, intWhy:"一年制职业导向，湾区招聘", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"一年制，看重实习与工程项目，适合就业导向"},
-    {s:"UIUC", p:"MS in Computer Science", city:"Urbana", st:"IL", reg:"midwest", ct:"小城", tuit:42000, liv:20512, lw:"17019", dur:2, d:0.72, gpa:3.00, toefl:103, gre:"opt", ddl:"12/15", f:"cs",rk:33, phd:1, phdWhy:"论文型硕士，研究组强", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", vfy:"官网：校区最低 GPA 3.0/4.0，录取均值高于此", vsrc:"https://cs.illinois.edu/admissions/graduate/faqs", note:"研究型学位偏好有论文；授课型 MCS 门槛略低"},
+    {s:"UIUC", p:"MS in Computer Science", city:"Urbana", st:"IL", reg:"midwest", ct:"小城", tuit:42000, liv:20512, lw:"17019", dur:2, d:0.72, gpa:3.00, toefl:103, gre:"opt", ddl:"12/15", f:"cs",rk:33, phd:1, phdWhy:"论文型硕士，研究组强", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", vfy:"官网：校区最低 GPA 3.0/4.0，录取均值高于此", vsrc:"https://cs.illinois.edu/admissions/graduate/faqs", note:"研究型学位偏好有论文；授课型 MCS 门槛略低",checked:"2026-10-28"},
     {s:"Georgia Tech", p:"MS in Computer Science", city:"Atlanta", st:"GA", reg:"south", ct:"大城市", tuit:35000, liv:27208, lw:"13121", dur:1.5, d:0.70, gpa:3.60, toefl:100, gre:"opt", ddl:"02/01", f:"cs",rk:33, int:1, intWhy:"co-op 项目，可选实习学期", phd:1, phdWhy:"可选论文 track", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"性价比极高，近年竞争快速上升"},
     {s:"Columbia", p:"MS in Computer Science", city:"New York", st:"NY", reg:"northeast", ct:"大城市", tuit:68000, liv:34768, lw:"36061", dur:1.5, d:0.76, gpa:3.70, toefl:100, gre:"opt", ddl:"01/15", f:"cs", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", rk:13, note:"纽约区位，班级规模大，学费高"},
     {s:"Michigan", p:"MS in Computer Science", city:"Ann Arbor", st:"MI", reg:"midwest", ct:"中型城市", tuit:58000, liv:24718, lw:"26161", dur:1.5, d:0.74, gpa:3.70, toefl:100, gre:"opt", ddl:"12/15", f:"cs",rk:21, phd:1, phdWhy:"论文可选，研究资源强", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"公立强校，研究与就业兼顾"},
@@ -1140,7 +1169,7 @@
     {s:"NJIT", p:"MS in Computer Science", city:"Newark", st:"NJ", reg:"northeast", ct:"大城市", tuit:32000, liv:24108, lw:"34013", dur:2, d:0.14, gpa:3.05, toefl:79, gre:"no", ddl:"滚动", f:"cs", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", rk:105, note:"工科导向，离纽约 30 分钟"},
     {s:"Illinois Tech", p:"MS in Computer Science", city:"Chicago", st:"IL", reg:"midwest", ct:"大城市", tuit:35000, liv:24194, lw:"17031", dur:2, d:0.12, gpa:3.00, toefl:79, gre:"no", ddl:"滚动", f:"cs",rk:105,conv:1, pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"门槛友好，芝加哥区位，班级规模小"},
     {s:"University of Cincinnati", p:"MS in Computer Science", city:"Cincinnati", st:"OH", reg:"midwest", ct:"中型城市", tuit:28000, liv:20367, lw:"39061", dur:2, d:0.10, gpa:3.00, toefl:79, gre:"no", ddl:"滚动", f:"cs",rk:152, int:1, intWhy:"co-op 制度发源地，带薪实习必修", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"带 co-op 传统，总花费低"},
-    {s:"USC", p:"MS in Computer Science", city:"Los Angeles", st:"CA", reg:"west", ct:"大城市", tuit:48000, liv:28144, lw:"06037", dur:2, d:0.64, gpa:3.45, toefl:100, gre:"opt", ddl:"12/15", f:"cs",rk:27, pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", vfy:"官网：无最低 GPA、无最低 TOEFL，全部申请完整评审", vsrc:"https://viterbigradadmission.usc.edu/programs/masters/faq/", note:"国际生比例高，按 GPA 分轮次审核"},
+    {s:"USC", p:"MS in Computer Science", city:"Los Angeles", st:"CA", reg:"west", ct:"大城市", tuit:48000, liv:28144, lw:"06037", dur:2, d:0.64, gpa:3.45, toefl:100, gre:"opt", ddl:"12/15", f:"cs",rk:27, pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", vfy:"官网：无最低 GPA、无最低 TOEFL，全部申请完整评审", vsrc:"https://viterbigradadmission.usc.edu/programs/masters/faq/", note:"国际生比例高，按 GPA 分轮次审核",checked:"2026-10-28"},
     {s:"NYU", p:"MS in Computer Science", city:"New York", st:"NY", reg:"northeast", ct:"大城市", tuit:55000, liv:34768, lw:"36061", dur:2, d:0.62, gpa:3.55, toefl:100, gre:"opt", ddl:"03/01", f:"cs", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", rk:30,camps:[{"n": "曼哈顿（Courant）", "city": "New York", "st": "NY", "tuit": 55000, "liv": 34768}, {"n": "布鲁克林（Tandon）", "city": "Brooklyn", "st": "NY", "tuit": 55000, "liv": 29400}],note:"Courant 偏理论、Tandon 偏就业，两院要分清"},
     {s:"Northeastern", p:"MS in Computer Science", city:"Boston", st:"MA", reg:"northeast", ct:"大城市", tuit:42000, liv:31164, lw:"25025", dur:2, d:0.48, gpa:3.40, toefl:92, gre:"no", ddl:"滚动", f:"cs", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可",  int:1, intWhy:"co-op 带薪实习学期", rk:44,camps:[{"n": "波士顿（主校区）", "city": "Boston", "st": "MA", "tuit": 42000, "liv": 31164}, {"n": "硅谷（圣何塞）", "city": "San Jose", "st": "CA", "tuit": 46000, "liv": 36694}, {"n": "西雅图", "city": "Seattle", "st": "WA", "tuit": 42000, "liv": 31425}, {"n": "波特兰（缅因州 Roux Institute）", "city": "Portland", "st": "ME", "tuit": 42000, "liv": 26201, "note": "学费按主校区费率估算，Roux 校区实际费率待核实"}],note:"带 co-op 实习项目，申请量大，早申明显有利"},
     {s:"UC Irvine", p:"Master of Computer Science", city:"Irvine", st:"CA", reg:"west", ct:"中型城市", tuit:38000, liv:34741, lw:"06059", dur:1.5, d:0.46, gpa:3.35, toefl:90, gre:"no", ddl:"01/15", f:"cs",rk:33, int:1, intWhy:"就业导向学位，橙县科技区", pre:"hard", preWhy:"要求 CS 或强相关本科：数据结构与算法、操作系统、离散数学通常缺一不可", note:"就业导向，适合想留在加州工作的申请者"},
@@ -2243,7 +2272,7 @@
 {"s":"Colorado School of Mines","p":"MS in Computer Engineering","city":"Golden","st":"CO","reg":"west","ct":"中型城市","tuit":30000,"tlo":22000,"thi":38000,"liv":26775,"dur":2,"d":0.42,"gpa":3.4,"toefl":100,"gre":"opt","ddl":"12/15","f":"ce","pre":"hard","rk":86,"est":1,"note":"学费为该校档位区间估算"}
   ];
 
-  var LWDATA = [{"k": "Santa Clara, CA (Palo Alto)", "fips": "06085", "title": "Santa Clara County, California", "official": 56867, "student": 36694, "url": "https://livingwage.mit.edu/counties/06085"}, {"k": "New York, NY", "fips": "36061", "title": "New York County, New York", "official": 57129, "student": 34768, "url": "https://livingwage.mit.edu/counties/36061"}, {"k": "Orange, CA (Irvine)", "fips": "06059", "title": "Orange County, California", "official": 54798, "student": 34741, "url": "https://livingwage.mit.edu/counties/06059"}, {"k": "Middlesex, MA (Cambridge/Boston)", "fips": "25017", "title": "Middlesex County, Massachusetts", "official": 51127, "student": 32243, "url": "https://livingwage.mit.edu/counties/25017"}, {"k": "San Diego, CA", "fips": "06073", "title": "San Diego County, California", "official": 50047, "student": 31889, "url": "https://livingwage.mit.edu/counties/06073"}, {"k": "Alameda, CA (Berkeley)", "fips": "06001", "title": "Alameda County, California", "official": 49496, "student": 31541, "url": "https://livingwage.mit.edu/counties/06001"}, {"k": "King, WA (Seattle)", "fips": "53033", "title": "King County, Washington", "official": 48569, "student": 31425, "url": "https://livingwage.mit.edu/counties/53033"}, {"k": "Suffolk, MA (Boston)", "fips": "25025", "title": "Suffolk County, Massachusetts", "official": 50659, "student": 31164, "url": "https://livingwage.mit.edu/counties/25025"}, {"k": "Snohomish, WA (Bothell)", "fips": "53061", "title": "Snohomish County, Washington", "official": 47093, "student": 30762, "url": "https://livingwage.mit.edu/counties/53061"}, {"k": "Fairfax, VA", "fips": "51600", "title": "Fairfax city, Virginia", "official": 46144, "student": 30100, "url": "https://livingwage.mit.edu/counties/51600"}, {"k": "Kings, NY (Brooklyn)", "fips": "36047", "title": "Kings County, New York", "official": 49442, "student": 29400, "url": "https://livingwage.mit.edu/counties/36047"}, {"k": "Los Angeles, CA", "fips": "06037", "title": "Los Angeles County, California", "official": 44263, "student": 28144, "url": "https://livingwage.mit.edu/counties/06037"}, {"k": "Hudson, NJ (Hoboken)", "fips": "34017", "title": "Hudson County, New Jersey", "official": 46975, "student": 28077, "url": "https://livingwage.mit.edu/counties/34017"}, {"k": "Wake, NC (Raleigh)", "fips": "37183", "title": "Wake County, North Carolina", "official": 41098, "student": 27249, "url": "https://livingwage.mit.edu/counties/37183"}, {"k": "Middlesex, NJ (New Brunswick)", "fips": "34023", "title": "Middlesex County, New Jersey", "official": 43127, "student": 27217, "url": "https://livingwage.mit.edu/counties/34023"}, {"k": "Fulton, GA (Atlanta)", "fips": "13121", "title": "Fulton County, Georgia", "official": 40839, "student": 27208, "url": "https://livingwage.mit.edu/counties/13121"}, {"k": "Bronx, NY (Fordham)", "fips": "36005", "title": "Bronx County, New York", "official": 44093, "student": 26371, "url": "https://livingwage.mit.edu/counties/36005"}, {"k": "Cumberland, ME (Portland)", "fips": "23005", "title": "Cumberland County, Maine", "official": 40085, "student": 26201, "url": "https://livingwage.mit.edu/counties/23005"}, {"k": "Pierce, WA (Tacoma)", "fips": "53053", "title": "Pierce County, Washington", "official": 39743, "student": 25907, "url": "https://livingwage.mit.edu/counties/53053"}, {"k": "Hampshire, MA (Amherst)", "fips": "25015", "title": "Hampshire County, Massachusetts", "official": 39460, "student": 25476, "url": "https://livingwage.mit.edu/counties/25015"}, {"k": "Maricopa, AZ (Tempe)", "fips": "04013", "title": "Maricopa County, Arizona", "official": 39138, "student": 25152, "url": "https://livingwage.mit.edu/counties/04013"}, {"k": "Mercer, NJ (Princeton)", "fips": "34021", "title": "Mercer County, New Jersey", "official": 38997, "student": 25119, "url": "https://livingwage.mit.edu/counties/34021"}, {"k": "Travis, TX (Austin)", "fips": "48453", "title": "Travis County, Texas", "official": 37974, "student": 25031, "url": "https://livingwage.mit.edu/counties/48453"}, {"k": "Washtenaw, MI (Ann Arbor)", "fips": "26161", "title": "Washtenaw County, Michigan", "official": 38367, "student": 24718, "url": "https://livingwage.mit.edu/counties/26161"}, {"k": "Dallas, TX (Richardson)", "fips": "48113", "title": "Dallas County, Texas", "official": 37333, "student": 24596, "url": "https://livingwage.mit.edu/counties/48113"}, {"k": "Durham, NC", "fips": "37063", "title": "Durham County, North Carolina", "official": 37620, "student": 24490, "url": "https://livingwage.mit.edu/counties/37063"}, {"k": "Cook, IL (Chicago)", "fips": "17031", "title": "Cook County, Illinois", "official": 38097, "student": 24194, "url": "https://livingwage.mit.edu/counties/17031"}, {"k": "Essex, NJ (Newark)", "fips": "34013", "title": "Essex County, New Jersey", "official": 38413, "student": 24108, "url": "https://livingwage.mit.edu/counties/34013"}, {"k": "Dane, WI (Madison)", "fips": "55025", "title": "Dane County, Wisconsin", "official": 37267, "student": 24017, "url": "https://livingwage.mit.edu/counties/55025"}, {"k": "Monroe, NY (Rochester)", "fips": "36055", "title": "Monroe County, New York", "official": 35252, "student": 22530, "url": "https://livingwage.mit.edu/counties/36055"}, {"k": "Allegheny, PA (Pittsburgh)", "fips": "42003", "title": "Allegheny County, Pennsylvania", "official": 34726, "student": 22256, "url": "https://livingwage.mit.edu/counties/42003"}, {"k": "Erie, NY (Buffalo)", "fips": "36029", "title": "Erie County, New York", "official": 34625, "student": 22214, "url": "https://livingwage.mit.edu/counties/36029"}, {"k": "St. Louis, MO", "fips": "29189", "title": "St. Louis County, Missouri", "official": 33740, "student": 22141, "url": "https://livingwage.mit.edu/counties/29189"}, {"k": "Onondaga, NY (Syracuse)", "fips": "36067", "title": "Onondaga County, New York", "official": 34331, "student": 21928, "url": "https://livingwage.mit.edu/counties/36067"}, {"k": "Philadelphia, PA", "fips": "42101", "title": "Philadelphia County, Pennsylvania", "official": 35434, "student": 21805, "url": "https://livingwage.mit.edu/counties/42101"}, {"k": "Brazos, TX (College Station)", "fips": "48041", "title": "Brazos County, Texas", "official": 32015, "student": 21171, "url": "https://livingwage.mit.edu/counties/48041"}, {"k": "Tippecanoe, IN (West Lafayette)", "fips": "18157", "title": "Tippecanoe County, Indiana", "official": 31754, "student": 20523, "url": "https://livingwage.mit.edu/counties/18157"}, {"k": "Champaign, IL (Urbana)", "fips": "17019", "title": "Champaign County, Illinois", "official": 31814, "student": 20512, "url": "https://livingwage.mit.edu/counties/17019"}, {"k": "Hamilton, OH (Cincinnati)", "fips": "39061", "title": "Hamilton County, Ohio", "official": 31440, "student": 20367, "url": "https://livingwage.mit.edu/counties/39061"}];
+  var LWDATA = [{"k":"Santa Clara, CA (Palo Alto)","fips":"06085","title":"Santa Clara County, California","official":56867,"student":36694,"url":"https://livingwage.mit.edu/counties/06085","parts":{"food":5036,"medical":3651,"housing":31614,"transport":10808,"civic":3876}},{"k":"New York, NY","fips":"36061","title":"New York County, New York","official":57129,"student":34768,"url":"https://livingwage.mit.edu/counties/36061","parts":{"food":7116,"medical":4695,"housing":35525,"transport":4710,"civic":3456}},{"k":"Orange, CA (Irvine)","fips":"06059","title":"Orange County, California","official":54798,"student":34741,"url":"https://livingwage.mit.edu/counties/06059","parts":{"food":4627,"medical":3241,"housing":32349,"transport":9204,"civic":3876}},{"k":"Middlesex, MA (Cambridge/Boston)","fips":"25017","title":"Middlesex County, Massachusetts","official":51127,"student":32243,"url":"https://livingwage.mit.edu/counties/25017","parts":{"food":5118,"medical":4067,"housing":28402,"transport":8013,"civic":3456}},{"k":"San Diego, CA","fips":"06073","title":"San Diego County, California","official":50047,"student":31889,"url":"https://livingwage.mit.edu/counties/06073","parts":{"food":4487,"medical":3243,"housing":27597,"transport":9308,"civic":3876}},{"k":"Alameda, CA (Berkeley)","fips":"06001","title":"Alameda County, California","official":49496,"student":31541,"url":"https://livingwage.mit.edu/counties/06001","parts":{"food":5083,"medical":3752,"housing":25818,"transport":9043,"civic":3876}},{"k":"King, WA (Seattle)","fips":"53033","title":"King County, Washington","official":48569,"student":31425,"url":"https://livingwage.mit.edu/counties/53033","parts":{"food":5234,"medical":3032,"housing":25589,"transport":8441,"civic":3876}},{"k":"Suffolk, MA (Boston)","fips":"25025","title":"Suffolk County, Massachusetts","official":50659,"student":31164,"url":"https://livingwage.mit.edu/counties/25025","parts":{"food":5141,"medical":4257,"housing":29455,"transport":5991,"civic":3456}},{"k":"Snohomish, WA (Bothell)","fips":"53061","title":"Snohomish County, Washington","official":47093,"student":30762,"url":"https://livingwage.mit.edu/counties/53061","parts":{"food":4790,"medical":3069,"housing":23464,"transport":9497,"civic":3876}},{"k":"Fairfax, VA","fips":"51600","title":"Fairfax city, Virginia","official":46144,"student":30100,"url":"https://livingwage.mit.edu/counties/51600","parts":{"food":5316,"medical":3460,"housing":25002,"transport":8197,"civic":2583}},{"k":"Kings, NY (Brooklyn)","fips":"36047","title":"Kings County, New York","official":49442,"student":29400,"url":"https://livingwage.mit.edu/counties/36047","parts":{"food":5118,"medical":4695,"housing":29727,"transport":4852,"civic":3456}},{"k":"Los Angeles, CA","fips":"06037","title":"Los Angeles County, California","official":44263,"student":28144,"url":"https://livingwage.mit.edu/counties/06037","parts":{"food":4463,"medical":3255,"housing":22471,"transport":8681,"civic":3876}},{"k":"Hudson, NJ (Hoboken)","fips":"34017","title":"Hudson County, New Jersey","official":46975,"student":28077,"url":"https://livingwage.mit.edu/counties/34017","parts":{"food":4300,"medical":3829,"housing":29032,"transport":4830,"civic":3456}},{"k":"Wake, NC (Raleigh)","fips":"37183","title":"Wake County, North Carolina","official":41098,"student":27249,"url":"https://livingwage.mit.edu/counties/37183","parts":{"food":4744,"medical":3354,"housing":19781,"transport":8986,"civic":2583}},{"k":"Middlesex, NJ (New Brunswick)","fips":"34023","title":"Middlesex County, New Jersey","official":43127,"student":27217,"url":"https://livingwage.mit.edu/counties/34023","parts":{"food":4393,"medical":3840,"housing":21534,"transport":8459,"civic":3456}},{"k":"Fulton, GA (Atlanta)","fips":"13121","title":"Fulton County, Georgia","official":40839,"student":27208,"url":"https://livingwage.mit.edu/counties/13121","parts":{"food":5176,"medical":3098,"housing":19875,"transport":8253,"civic":2583}},{"k":"Bronx, NY (Fordham)","fips":"36005","title":"Bronx County, New York","official":44093,"student":26371,"url":"https://livingwage.mit.edu/counties/36005","parts":{"food":4557,"medical":4695,"housing":23928,"transport":6045,"civic":3456}},{"k":"Cumberland, ME (Portland)","fips":"23005","title":"Cumberland County, Maine","official":40085,"student":26201,"url":"https://livingwage.mit.edu/counties/23005","parts":{"food":4907,"medical":3501,"housing":17317,"transport":9307,"civic":3456}},{"k":"Pierce, WA (Tacoma)","fips":"53053","title":"Pierce County, Washington","official":39743,"student":25907,"url":"https://livingwage.mit.edu/counties/53053","parts":{"food":4662,"medical":3070,"housing":17224,"transport":9270,"civic":3876}},{"k":"Hampshire, MA (Amherst)","fips":"25015","title":"Hampshire County, Massachusetts","official":39460,"student":25476,"url":"https://livingwage.mit.edu/counties/25015","parts":{"food":5234,"medical":3860,"housing":16669,"transport":8547,"civic":3456}},{"k":"Maricopa, AZ (Tempe)","fips":"04013","title":"Maricopa County, Arizona","official":39138,"student":25152,"url":"https://livingwage.mit.edu/counties/04013","parts":{"food":4183,"medical":3005,"housing":17762,"transport":8503,"civic":3876}},{"k":"Mercer, NJ (Princeton)","fips":"34021","title":"Mercer County, New Jersey","official":38997,"student":25119,"url":"https://livingwage.mit.edu/counties/34021","parts":{"food":4720,"medical":3938,"housing":16211,"transport":8383,"civic":3456}},{"k":"Travis, TX (Austin)","fips":"48453","title":"Travis County, Texas","official":37974,"student":25031,"url":"https://livingwage.mit.edu/counties/48453","parts":{"food":4159,"medical":3075,"housing":18213,"transport":8465,"civic":2583}},{"k":"Washtenaw, MI (Ann Arbor)","fips":"26161","title":"Washtenaw County, Michigan","official":38367,"student":24718,"url":"https://livingwage.mit.edu/counties/26161","parts":{"food":4639,"medical":3716,"housing":16464,"transport":8683,"civic":3347}},{"k":"Dallas, TX (Richardson)","fips":"48113","title":"Dallas County, Texas","official":37333,"student":24596,"url":"https://livingwage.mit.edu/counties/48113","parts":{"food":4019,"medical":3032,"housing":17805,"transport":8440,"civic":2583}},{"k":"Durham, NC","fips":"37063","title":"Durham County, North Carolina","official":37620,"student":24490,"url":"https://livingwage.mit.edu/counties/37063","parts":{"food":4533,"medical":3419,"housing":17819,"transport":7773,"civic":2583}},{"k":"Cook, IL (Chicago)","fips":"17031","title":"Cook County, Illinois","official":38097,"student":24194,"url":"https://livingwage.mit.edu/counties/17031","parts":{"food":4720,"medical":3594,"housing":17405,"transport":7211,"civic":3347}},{"k":"Essex, NJ (Newark)","fips":"34013","title":"Essex County, New Jersey","official":38413,"student":24108,"url":"https://livingwage.mit.edu/counties/34013","parts":{"food":5083,"medical":3829,"housing":17549,"transport":7001,"civic":3456}},{"k":"Dane, WI (Madison)","fips":"55025","title":"Dane County, Wisconsin","official":37267,"student":24017,"url":"https://livingwage.mit.edu/counties/55025","parts":{"food":4697,"medical":3785,"housing":15294,"transport":8684,"civic":3347}},{"k":"Monroe, NY (Rochester)","fips":"36055","title":"Monroe County, New York","official":35252,"student":22530,"url":"https://livingwage.mit.edu/counties/36055","parts":{"food":4592,"medical":3690,"housing":13940,"transport":8162,"civic":3456}},{"k":"Allegheny, PA (Pittsburgh)","fips":"42003","title":"Allegheny County, Pennsylvania","official":34726,"student":22256,"url":"https://livingwage.mit.edu/counties/42003","parts":{"food":4767,"medical":3691,"housing":13307,"transport":7637,"civic":3456}},{"k":"Erie, NY (Buffalo)","fips":"36029","title":"Erie County, New York","official":34625,"student":22214,"url":"https://livingwage.mit.edu/counties/36029","parts":{"food":4627,"medical":3464,"housing":13727,"transport":7823,"civic":3456}},{"k":"St. Louis, MO","fips":"29189","title":"St. Louis County, Missouri","official":33740,"student":22141,"url":"https://livingwage.mit.edu/counties/29189","parts":{"food":4790,"medical":3343,"housing":12273,"transport":8550,"civic":3347}},{"k":"Onondaga, NY (Syracuse)","fips":"36067","title":"Onondaga County, New York","official":34331,"student":21928,"url":"https://livingwage.mit.edu/counties/36067","parts":{"food":4580,"medical":3957,"housing":12474,"transport":8402,"civic":3456}},{"k":"Philadelphia, PA","fips":"42101","title":"Philadelphia County, Pennsylvania","official":35434,"student":21805,"url":"https://livingwage.mit.edu/counties/42101","parts":{"food":4627,"medical":4053,"housing":15299,"transport":5831,"civic":3456}},{"k":"Brazos, TX (College Station)","fips":"48041","title":"Brazos County, Texas","official":32015,"student":21171,"url":"https://livingwage.mit.edu/counties/48041","parts":{"food":3821,"medical":3133,"housing":12821,"transport":8144,"civic":2583}},{"k":"Tippecanoe, IN (West Lafayette)","fips":"18157","title":"Tippecanoe County, Indiana","official":31754,"student":20523,"url":"https://livingwage.mit.edu/counties/18157","parts":{"food":4008,"medical":3526,"housing":10895,"transport":8502,"civic":3347}},{"k":"Champaign, IL (Urbana)","fips":"17019","title":"Champaign County, Illinois","official":31814,"student":20512,"url":"https://livingwage.mit.edu/counties/17019","parts":{"food":4241,"medical":3393,"housing":11405,"transport":8013,"civic":3347}},{"k":"Hamilton, OH (Cincinnati)","fips":"39061","title":"Hamilton County, Ohio","official":31440,"student":20367,"url":"https://livingwage.mit.edu/counties/39061","parts":{"food":4300,"medical":3392,"housing":10834,"transport":8266,"civic":3347}}];
 
   var STAGES = [
     {id:"s1", from:18, to:15, title:"定方向与初选", goal:"把 30 所长名单收敛到 10 所",
@@ -2696,7 +2725,7 @@
         '<br>项目难度 <b>' + diffTag(pr.d) + '</b> · 录取中位 GPA <b>' + pr.gpa.toFixed(2) + '</b> · 语言门槛 <b>' + pr.toefl + '</b>' +
         '<br><span style="color:var(--ink3)">个人匹配度是"你的背景与该项目要求的接近程度"，不是录取概率</span>' +
       '</div></details>' +
-      '<div class="foot">' + (progUrl(pr)
+      '<div class="foot"><a href="javascript:void 0" data-dos="' + esc(pk(pr)) + '">项目档案 →</a>' + (progUrl(pr)
           ? '<a href="' + progUrl(pr) + '" target="_blank" rel="noopener">项目页 ↗</a>'
           : '<a href="' + srcUrl(pr) + '" target="_blank" rel="noopener">搜索项目页 ↗</a>') +
           '<span class="asof" title="该链接的核对日期；超过 3 个月建议重新确认">核对于 2026-10</span>' +
@@ -3883,6 +3912,144 @@
     });
   }
 
+
+  /* ================= 项目档案 ================= */
+  var LWCITY = (function(){
+    var m = {};
+    LWDATA.forEach(function(d){
+      var base = d.k.split(",")[0].trim();
+      var mm = d.k.match(/\(([^)]+)\)/);
+      var alias = mm ? mm[1].trim() : "";
+      if(base) m[base.toLowerCase()] = d;
+      if(alias) m[alias.toLowerCase()] = d;
+    });
+    return m;
+  })();
+
+  function lwFor(city){
+    if(!city) return null;
+    var c = String(city).toLowerCase();
+    if(LWCITY[c]) return LWCITY[c];
+    var keys = Object.keys(LWCITY);
+    for(var i=0;i<keys.length;i++){
+      if(c.indexOf(keys[i]) === 0 || keys[i].indexOf(c) === 0) return LWCITY[keys[i]];
+    }
+    return null;
+  }
+
+  // 学费 / 必缴费用 / 医保 / 住宿 / 餐饮 / 交通 / 其他
+  function costBreakdown(p){
+    var lw = lwFor(p.city), parts = (lw && lw.parts) || null;
+    var real = !!parts;
+    var housing = parts ? Math.round(parts.housing * 0.6) : Math.round(p.liv * 0.45);
+    var food    = parts ? parts.food : Math.round(p.liv * 0.22);
+    var trans   = parts ? parts.transport : Math.round(p.liv * 0.16);
+    var internet= parts ? (parts.internet || 1500) : 1500;
+    var civic   = parts ? parts.civic : Math.round(p.liv * 0.12);
+    var fees    = p.priv === false ? 1800 : 2200;
+    var ins     = 3800;
+    var tuit    = TUIT(p);
+    var other   = internet + civic;
+    var total   = tuit + fees + ins + housing + food + trans + other;
+    return {tuit:tuit, fees:fees, ins:ins, housing:housing, food:food, trans:trans,
+            other:other, total:total, real:real, county:(lw && lw.title) || "",
+            lwUrl:(lw && lw.url) || ""};
+  }
+
+  // 数据新鲜度
+  function freshness(p){
+    var now = new Date();
+    var dl = ddlDate(p);
+    if(dl && dl < now) return {t:"截止已过 · 上一申请周期", cls:"t-stale"};
+    if(!p.checked) return {t:"未核实", cls:"t-stale"};
+    var d0 = new Date(p.checked);
+    var days = Math.floor((now - d0) / 86400000);
+    if(days <= 30) return {t:"近期核实（" + days + " 天前）", cls:"t-verified"};
+    if(days <= 90) return {t:"建议复核（" + days + " 天前）", cls:"t-est"};
+    return {t:"需要更新（" + days + " 天前）", cls:"t-stale"};
+  }
+
+  function openDossier(p){
+    var cb = costBreakdown(p), fr = freshness(p), tr = TRUST[trustOf(p)];
+    var ven = p.vsrc ? "已确认" : "未确认";
+    var row = function(k, v, note){
+      return '<div class="dos-row"><span class="k">' + k + '</span><span class="v">' + v +
+        (note ? '<span class="n">' + note + '</span>' : '') + '</span></div>';
+    };
+    var money2 = function(x){ return "$" + x.toLocaleString("en-US"); };
+    var perYear = function(x){ return Math.round(x / p.dur); };
+
+    var h = '<div class="cmp-box dos-box" role="dialog" aria-modal="true">' +
+      '<div class="cmp-head"><h3>项目档案 · ' + esc(p.s) + '</h3>' +
+      '<button class="cmp-x" id="dosClose" aria-label="关闭">✕</button></div>' +
+      '<div class="dos-body">' +
+        '<div class="dos-trust">' + trustTag(p) +
+          '<span class="dos-fresh ' + fr.cls + '">' + fr.t + '</span>' +
+          '<a class="dos-link" href="' + srcUrl(p) + '" target="_blank" rel="noopener">' +
+            (progUrl(p) ? "项目官网 ↗" : "搜索项目页 ↗") + '</a></div>' +
+
+        '<div class="dos-sec">基本信息</div>' +
+        row("学校名称", esc(p.s)) +
+        row("学位名称", esc(p.p)) +
+        row("所属学院", p.dept ? esc(p.dept) : '<span class="miss">未收录</span>') +
+        row("项目学制", p.dur + " 年") +
+        row("学费计算方式", "按学年计费 × " + p.dur + " 年<span class=\"n\">多数项目按学分计，此处按官网年费率折算</span>") +
+        row("申请截止", p.ddl + ' <span class="n">2027 秋季入学（按惯例，需官网确认）</span>') +
+        row("项目官网", progUrl(p) ? '<a href="' + progUrl(p) + '" target="_blank" rel="noopener">直达 ↑</a>' : '<span class="miss">未收录，可搜索</span>') +
+
+        '<div class="dos-sec">录取要求</div>' +
+        row("TOEFL 最低", p.toefl ? p.toefl + " 分" : '<span class="miss">未标注</span>') +
+        row("GRE 要求", p.gre === "req" ? "必须提交" : p.gre === "opt" ? "可选提交" : "不需要") +
+        row("CS 先修", (PRE_LABEL[p.pre] || "—") + (p.preWhy ? '<span class="n">' + esc(p.preWhy) + '</span>' : '')) +
+        row("STEM CIP 代码", p.cip ? esc(p.cip) : '<span class="miss">未收录</span>') +
+        row("RA / TA 机会", p.phd ? "有（研究型项目）" : "未标注") +
+        row("实习与就业", p.int ? "有结构性支持（co-op / 实习学分）" : "无特别标注") +
+
+        '<div class="dos-sec">费用拆解 <span class="n2">单位：美元 / 年</span></div>' +
+        '<table class="dos-cost"><tbody>' +
+        '<tr><th>Tuition 学费</th><td>' + money2(perYear(cb.tuit)) +
+          (p.est ? '<span class="n"> 区间 ' + money2(Math.round(perYear(cb.tuit*0.9))) + '–' + money2(Math.round(perYear(cb.tuit*1.1))) + '</span>' : '') + '</td></tr>' +
+        '<tr><th>Mandatory Fees 必缴费用</th><td>' + money2(cb.fees) + '<span class="n"> 估算</span></td></tr>' +
+        '<tr><th>Health Insurance 医保</th><td>' + money2(cb.ins) + '<span class="n"> 估算，可用学校保险替换</span></td></tr>' +
+        '<tr><th>Housing 住宿</th><td>' + money2(cb.housing) + '<span class="n"> ' + (cb.real ? "合租口径 · " + esc(cb.county) : "城市均值") + '</span></td></tr>' +
+        '<tr><th>Food 餐饮</th><td>' + money2(cb.food) + '</td></tr>' +
+        '<tr><th>Transportation 交通</th><td>' + money2(cb.trans) + '</td></tr>' +
+        '<tr><th>Other 其他开销</th><td>' + money2(cb.other) + '<span class="n"> 网络 + 个人</span></td></tr>' +
+        '<tr class="sum"><th>合计 / 年</th><td>' + money2(perYear(cb.total)) + '</td></tr>' +
+        '<tr class="sum"><th>合计 / 全程（' + p.dur + ' 年）</th><td>' + money2(cb.total) + ' ≈ ' + wan(cb.total * FX) + ' 万</td></tr>' +
+        '</tbody></table>' +
+        (cb.lwUrl ? '<div class="dos-src">生活分项来源：<a href="' + cb.lwUrl + '" target="_blank" rel="noopener">MIT Living Wage · ' + esc(cb.county) + ' ↗</a></div>' : '') +
+
+        '<div class="dos-sec">数据状态</div>' +
+        row("可信度", trustTag(p) + '<span class="n">' + tr.d + '</span>') +
+        row("最近核实", p.checked ? p.checked + ' <span class="n">' + ven + '</span>' : '<span class="miss">从未核实</span>') +
+        row("新鲜度", '<span class="dos-fresh ' + fr.cls + '">' + fr.t + '</span>') +
+      '</div></div>';
+
+    var wrap = document.getElementById("dossier");
+    wrap.innerHTML = h;
+    wrap.hidden = false;
+    document.body.style.overflow = "hidden";
+    document.getElementById("dosClose").addEventListener("click", closeDossier);
+    wrap.addEventListener("click", function(e){ if(e.target === wrap) closeDossier(); });
+  }
+  function bindDossier(){
+    document.addEventListener("click", function(e){
+      var b = e.target.closest("[data-dos]");
+      if(!b) return;
+      e.preventDefault();
+      var k2 = b.dataset.dos;
+      var p2 = PROGRAMS.filter(function(x){ return pk(x) === k2; })[0];
+      if(p2) openDossier(p2);
+    });
+  }
+
+  function closeDossier(){
+    var w = document.getElementById("dossier");
+    if(w){ w.hidden = true; w.innerHTML = ""; }
+    document.body.style.overflow = "";
+  }
+
   /* ================= 初始化 ================= */
   function init(){
     $("#mCount").textContent = PROGRAMS.length;
@@ -3911,6 +4078,7 @@
     bindReverse();
     renderCmpBar();
     bindShortlist();
+    bindDossier();
     bindCompare();
     bindBackup();
 
