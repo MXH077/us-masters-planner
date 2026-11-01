@@ -196,6 +196,30 @@
   .store-note{font-size:12px; color:var(--ink2); background:#FBF7EE; border:1px solid #EBD9BC;
     border-radius:8px; padding:10px 14px; margin-bottom:20px; line-height:1.7;}
   .store-note b{color:var(--ink);}
+  .nc-sum{display:flex; align-items:baseline; gap:14px; margin-bottom:16px;}
+  .nc-k{font-size:20px; font-weight:600; color:var(--ink);}
+  .nc-sub{font-size:12px; color:var(--ink3);}
+  .nc-list{display:flex; flex-direction:column; gap:10px;}
+  .nc-item{display:flex; gap:14px; padding:14px 18px; border-radius:12px; border:1px solid var(--line); background:#fff;}
+  .nc-item.nc-ok{border-left:3px solid #2F6B3E;}
+  .nc-item.nc-warn{border-left:3px solid #A9661A;}
+  .nc-item.nc-bad{border-left:3px solid #9B3A32;}
+  .nc-item.nc-info{border-left:3px solid #2F4B7C;}
+  .nc-ico{flex:0 0 22px; height:22px; border-radius:50%; text-align:center; line-height:22px; font-size:12px;
+    font-weight:700; color:#fff; margin-top:1px;}
+  .nc-ok .nc-ico{background:#2F6B3E;} .nc-warn .nc-ico{background:#A9661A;}
+  .nc-bad .nc-ico{background:#9B3A32;} .nc-info .nc-ico{background:#2F4B7C;}
+  .nc-q{font-size:13.5px; font-weight:600; margin-bottom:4px;}
+  .nc-a{font-size:12.8px; line-height:1.75; color:var(--ink2);}
+  .nc-act{font-size:12px; color:var(--green); margin-top:6px;}
+  .nc-pick{margin-top:24px; padding:16px 20px; border:1px solid var(--line); border-radius:12px; background:#FBF9F4;}
+  .nc-ph{font-size:13px; font-weight:600; margin-bottom:12px;}
+  .nc-pgrid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;}
+  .nc-pcard{background:#fff; border:1px solid var(--line); border-radius:9px; padding:10px 12px;}
+  .nc-pn{font-size:13px; font-weight:600;}
+  .nc-pp{font-size:11.5px; color:var(--ink2); margin:3px 0;}
+  .nc-pm{font-size:11px; color:var(--ink3);}
+  @media (max-width:760px){ .nc-pgrid{grid-template-columns:1fr;} }
   #board{margin-bottom:26px;}
   .board-empty{padding:16px 20px; border:1px dashed var(--line2); border-radius:12px; font-size:13px; color:var(--ink3);}
   .board-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px;}
@@ -654,6 +678,7 @@
 
   <nav class="tabs" role="tablist" aria-label="导航">
     <button class="tab" role="tab" data-tab="match" aria-selected="true">选校推荐</button>
+    <button class="tab" role="tab" data-tab="noncs" aria-selected="false">跨专业评估</button>
     <button class="tab" role="tab" data-tab="reverse" aria-selected="false">反向选校</button>
     <button class="tab" role="tab" data-tab="shortlist" aria-selected="false">我的清单</button>
     <button class="tab" role="tab" data-tab="db" aria-selected="false">项目库</button>
@@ -906,6 +931,13 @@
       </div>
 
       <div id="revResult"></div>
+    </section>
+
+
+    <section class="panel" id="panel-noncs" role="tabpanel">
+      <div class="sec-title"><h2>跨专业申请评估</h2><span class="hint">针对物理 / 数学 / 电子等背景转 CS·AI</span></div>
+      <p class="sec-sub">这一页把"跨专业能不能申"拆成 7 个可以回答的问题。结论完全由你上面填的课程与经历推算，填得越实，判断越准。</p>
+      <div id="noncsBody"></div>
     </section>
 
     <section class="panel" id="panel-shortlist" role="tabpanel">
@@ -2977,6 +3009,7 @@
         '换句话说，约 <b>' + Math.max(0, 100 - pct) + '%</b> 的项目对你来说是冲刺档。';
     }
 
+    renderNonCS();
     renderProfileCard(P);
     renderGapReport();
     window.__combo = null;
@@ -4037,6 +4070,147 @@
 
 
 
+
+
+  /* ================= 跨专业评估 ================= */
+  function noncsEval(){
+    var P = evalProfile();
+    var m = state.math || [], cs = state.cs || [];
+    var major = state.major || "cs";
+    var items = [];
+
+    // 1 本科背景
+    var acceptMap = {
+      cs:"CS / 软件：无跨专业问题", ee:"电子 / 通信：属相关理工科，绝大多数项目接受",
+      math:"数学 / 统计：数学基础通常被认可，缺的是工程课",
+      physics:"物理 / 天文：理工背景受认可，缺 CS 核心课",
+      chembio:"化学 / 生物：接受度中等，需要较强的项目背书",
+      econ:"经济 / 金融：偏商科，CS 项目接受度较低",
+      biz:"商科 / 管理：跨申 CS 难度大，建议优先 MIS / 商业分析",
+      other:"其他专业：需要先修课 + 强项目才有竞争力"
+    };
+    var convN = PROGRAMS.filter(function(x){ return x.conv; }).length;
+    var okMajor = (major === "cs" || major === "ee" || major === "math" || major === "physics");
+    items.push({
+      k:"本科背景", s: okMajor ? "ok" : (major === "chembio" ? "warn" : "bad"),
+      q:"我的本科专业会被接受吗？",
+      a: acceptMap[major] + (okMajor ? "。库里有 " + convN + " 个项目明确写了欢迎非 CS 背景。" : "。建议优先看「转码友好」或先修要求为「不要求 / 需补课」的项目。"),
+      act: okMajor ? "" : "先筛出 conv=转码友好 的项目，再投传统 MSCS"
+    });
+
+    // 2 数学基础
+    var mathNeed = [{k:"la",n:"线性代数"},{k:"prob",n:"概率统计"},{k:"calc",n:"微积分"}];
+    var mathHave = mathNeed.filter(function(x){ return m.indexOf(x.k) > -1; });
+    var mathState = mathHave.length === 3 ? "ok" : (mathHave.length >= 1 ? "warn" : "bad");
+    var mathMiss = mathNeed.filter(function(x){ return m.indexOf(x.k) < 0; }).map(function(x){ return x.n; });
+    items.push({
+      k:"数学基础", s: mathState,
+      q:"数学先修满足吗？",
+      a: mathHave.length === 3 ? "线代 / 概率 / 微积分都有，数学这条线不构成障碍。"
+        : "已有 " + mathHave.length + "/3 门" + (mathMiss.length ? "，缺 " + mathMiss.join("、") : "") + "。AI / ML 方向对概率与线代是硬要求。",
+      act: mathMiss.length ? "优先补 " + mathMiss.join("、") : ""
+    });
+
+    // 3 编程
+    var progState = state.prog === "strong" ? "ok" : (state.prog === "mid" ? "warn" : "bad");
+    items.push({
+      k:"编程基础", s: progState,
+      q:"只会 Python 够不够？",
+      a: state.prog === "strong" ? "编程能力较强，足以支撑课程作业与项目。"
+        : state.prog === "mid" ? "一般水平：够写脚本和课程项目，但算法题与系统课会吃力。"
+        : "较弱：多数项目的第一学期就会用到 C++/Java 或大量代码，需要先补。",
+      act: state.prog === "strong" ? "" : "刷 100–150 道算法题 + 用 Python 复现 1 个 ML 项目"
+    });
+
+    // 4 CS 基础
+    var csNeed = [{k:"dsa", n:"数据结构与算法", has: String(state.dsa)==="1"},
+                  {k:"os", n:"操作系统", has: cs.indexOf("os")>-1},
+                  {k:"net", n:"计算机网络", has: cs.indexOf("net")>-1}];
+    var csHave = csNeed.filter(function(x){ return x.has; });
+    var csState = csHave.length >= 2 ? "ok" : (csHave.length === 1 ? "warn" : "bad");
+    items.push({
+      k:"CS 基础", s: csState,
+      q:"需要数据结构、算法吗？",
+      a: csHave.length ? "已具备 " + csHave.map(function(x){ return x.n; }).join("、") + "（" + csHave.length + "/3）。"
+        : "三门核心课都没修：这是跨专业最容易被卡的地方，很多项目录取前就会要求补。",
+      act: csHave.length >= 2 ? "" : "优先补「数据结构与算法」，其次操作系统"
+    });
+
+    // 5 科研
+    var resState = P.resN >= 0.6 ? "ok" : (P.resN >= 0.35 ? "warn" : "bad");
+    items.push({
+      k:"科研经历", s: resState,
+      q:"现有项目能支撑 AI 申请吗？",
+      a: P.resN >= 0.6 ? "科研分 " + Math.round(P.resN*100) + "：有可写的项目/论文，跨专业的说服力主要靠这块。"
+        : P.resN >= 0.35 ? "科研分 " + Math.round(P.resN*100) + "：有基础但不够硬，建议把课程项目做成能讲清楚的完整作品。"
+        : "科研分 " + Math.round(P.resN*100) + "：几乎空白。跨专业又没有项目，很难解释「为什么转」。",
+      act: P.resN >= 0.6 ? "" : "做 1 个端到端 ML 项目（数据→训练→评估→部署），写成两页 PDF"
+    });
+
+    // 6 项目选择
+    var softN = PROGRAMS.filter(function(x){ return x.pre !== "hard"; }).length;
+    var hardN = PROGRAMS.length - softN;
+    items.push({
+      k:"项目选择", s: softN > hardN * 0.3 ? "ok" : "warn",
+      q:"哪些学校接受跨专业？",
+      a: "全库 " + PROGRAMS.length + " 个项目中：" + softN + " 个不要求 CS 本科（不要求 " +
+        PROGRAMS.filter(function(x){ return x.pre === "none"; }).length + " 个 / 需补先修 " +
+        PROGRAMS.filter(function(x){ return x.pre === "soft"; }).length + " 个），" + hardN + " 个明确要求 CS 本科。",
+      act: "在项目库把「CS 先修」筛成「不要求」或「需补先修」"
+    });
+
+    // 7 策略
+    var aiFriendly = P.matchN < 0.6 && P.resN >= 0.45 && P.gpaN >= 0.55;
+    items.push({
+      k:"申请策略", s: "info",
+      q:"该优先申 AI 还是传统 MSCS？",
+      a: aiFriendly
+        ? "你的情况更像「理工底子 + 项目强、CS 课程弱」。建议主申 AI / DS / 应用型项目（如 MCS、MEng），传统 MSCS 作为冲刺，因为它们对 CS 核心课的要求更硬。"
+        : P.matchN >= 0.7
+          ? "CS 课程与编程基础都比较扎实，可以直接申传统 MSCS；AI 方向作为并列选项。"
+          : "两条线都建议投：AI/DS 方向对跨专业更宽容，MSCS 用来冲排名。比例可以先 6:4。",
+      act: ""
+    });
+
+    return items;
+  }
+
+  function renderNonCS(){
+    var box = document.getElementById("noncsBody");
+    if(!box) return;
+    var items = noncsEval();
+    var ICON = {ok:"✓", warn:"!", bad:"✕", info:"→"};
+    var bad = items.filter(function(x){ return x.s === "bad"; }).length;
+    var warn = items.filter(function(x){ return x.s === "warn"; }).length;
+
+    var h = '<div class="nc-sum"><div class="nc-k">' + (bad ? bad + " 项需要补" : (warn ? warn + " 项待加强" : "基本就绪")) +
+      '</div><div class="nc-sub">7 项评估 · 结论由你填写的课程与经历推算</div></div><div class="nc-list">';
+    items.forEach(function(x){
+      h += '<div class="nc-item nc-' + x.s + '">' +
+        '<div class="nc-ico">' + ICON[x.s] + '</div>' +
+        '<div class="nc-main"><div class="nc-q">' + x.k + ' · ' + x.q + '</div>' +
+        '<div class="nc-a">' + x.a + '</div>' +
+        (x.act ? '<div class="nc-act">→ ' + x.act + '</div>' : '') +
+        '</div></div>';
+    });
+    h += '</div>';
+
+    // 推荐优先申请：转码友好 / 先修宽松
+    var picks = PROGRAMS.filter(function(x){
+      return state.fields.indexOf(x.f) > -1 && (x.conv || x.pre !== "hard");
+    }).sort(function(a,b){ return (RK(a)||999) - (RK(b)||999); }).slice(0,6);
+    if(picks.length){
+      h += '<div class="nc-pick"><div class="nc-ph">对跨专业更友好的项目（按综排）</div><div class="nc-pgrid">';
+      picks.forEach(function(p2){
+        var m2 = TIER_META["match"];
+        h += '<div class="nc-pcard"><div class="nc-pn">' + esc(p2.s) + '</div>' +
+          '<div class="nc-pp">' + esc(p2.p) + '</div>' +
+          '<div class="nc-pm">' + (PRE_LABEL[p2.pre] || "") + ' · 综排 #' + (RK(p2) || "—") + '</div></div>';
+      });
+      h += '</div></div>';
+    }
+    box.innerHTML = h;
+  }
 
   /* ================= 申请进度看板 ================= */
   var APP_STAGES = [
