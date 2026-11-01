@@ -298,6 +298,8 @@
   .summary b{color:var(--ink); font-family:var(--mono);}
 
 
+  .lk-search{font-size:9px; color:var(--ink3); border:1px solid var(--line2); border-radius:3px;
+    padding:0 3px; margin-left:4px; vertical-align:1px;}
   .sch-link{color:inherit; text-decoration:none; border-bottom:1px solid transparent;}
   .sch-link:hover{color:var(--green); border-bottom-color:#BBD3CB;}
   .lvtag{display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:4px; letter-spacing:.02em;}
@@ -2583,6 +2585,14 @@
     if(p.vsrc) return p.vsrc;
     return PURL[p.s + "|" + p.f] || "";
   }
+  // 反向选校表格用：优先直达项目页，没有就打开"限定官网域名的项目搜索"
+  function progLink(p, text){
+    var direct = progUrl(p);
+    var href = direct || srcUrl(p);
+    var title = direct ? "打开项目官网页面" : "该项目页未收录，打开官网域内的项目搜索";
+    return '<a class="sch-link" href="' + href + '" target="_blank" rel="noopener" title="' + title + '">' +
+      text + (direct ? '' : '<span class="lk-search">搜索</span>') + '</a>';
+  }
   function srcUrl(p){
     var u = progUrl(p);
     if(u) return u;
@@ -3841,8 +3851,8 @@
       if(p.int) tags.push("实习");
       if(p.phd) tags.push("申博");
       return "<tr>" +
-        '<td><span class="uni">' + schoolLink(p.s) + trustTag(p) + '</span>' +
-        '<span class="pgm">' + esc(p.p) + ' · ' + p.dur + ' 年</span></td>' +
+        '<td><span class="uni">' + progLink(p, esc(p.s)) + trustTag(p) + '</span>' +
+        '<span class="pgm">' + progLink(p, esc(p.p)) + ' · ' + p.dur + ' 年</span></td>' +
         '<td class="num">' + (RK(p) ? "#" + RK(p) : "—") + '</td>' +
         '<td class="loc">' + esc(p.city) + ', ' + p.st + '<small>' + REGIONS[p.reg].n + '</small></td>' +
         '<td class="num">' + wan(totalWan(p)*10000) + ' 万</td>' +
